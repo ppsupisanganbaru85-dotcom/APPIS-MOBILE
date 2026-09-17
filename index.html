@@ -1,0 +1,1117 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>APPIS | PPSU Pisangan Baru</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+    
+    <style>
+/* --- VARIABLES --- */
+:root {
+    --radius: 250px;
+    --speed: 18s;
+    --profile-size: 220px;
+    --bg: #050810;
+    --txt: #ffffff;
+    --title: #ffffff;
+    --accent: #facc15;
+    --card-bg: rgba(255, 255, 255, 0.03);
+    --nav-bg: rgba(5, 8, 16, 0.95);
+    --ring-shadow: rgba(250, 204, 21, 0.3);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --cable-color: #475569;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --error: #ef4444;
+}
+
+.light-mode {
+    --bg: #f8fafc;
+    --txt: #475569;
+    --title: #1e293b;
+    --accent: #0000ff;
+    --card-bg: #ffffff;
+    --nav-bg: rgba(255, 255, 255, 0.98);
+    --ring-shadow: rgba(13, 5, 242, 0.15);
+    --glass-border: rgba(13, 5, 242, 0.1);
+    --cable-color: #0000ff;
+}
+
+* { 
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box; 
+    font-family: 'Plus Jakarta Sans', sans-serif; 
+    scroll-behavior: smooth; 
+}
+
+body { 
+    background-color: var(--bg); 
+    color: var(--txt); 
+    transition: 0.5s; 
+    overflow-x: hidden; 
+    width: 100%; 
+}
+
+/* --- 1. LOADING SYSTEM --- */
+#loader {
+    position: fixed; inset: 0; background: #050810; z-index: 10000;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    transition: opacity 0.5s;
+}
+.loader-logo { width: 100px; height: 100px; object-fit: contain; margin-bottom: 20px; animation: pulseLogo 2s infinite; }
+.loader-bar { width: 200px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden; }
+.loader-progress { width: 0%; height: 100%; background: var(--accent); transition: width 0.5s; }
+@keyframes pulseLogo { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.08); opacity: 0.8; } }
+
+/* --- 2. LOGIN SYSTEM --- */
+#main-content { display: none; } 
+.login-modal {
+    display: flex; position: fixed; inset: 0; background: var(--bg);
+    z-index: 9000; justify-content: center; align-items: center; 
+    transition: opacity 0.5s; padding: 20px;
+}
+.login-content { 
+    background: var(--card-bg); border: 1px solid var(--glass-border); 
+    border-radius: 30px; padding: 40px 30px; width: 100%; max-width: 400px; 
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5); backdrop-filter: blur(20px);
+    text-align: center;
+}
+.login-logo { width: 80px; height: 80px; object-fit: contain; margin-bottom: 10px; }
+.btn-3d {
+    width: 100%; padding: 14px; border-radius: 12px; border: none; font-weight: 700;
+    cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;
+    transition: 0.2s; position: relative; font-size: 0.9rem;
+}
+.btn-3d:hover { transform: translateY(-2px); filter: brightness(1.1); }
+
+.login-input {
+    width: 100%; padding: 14px 18px; margin-bottom: 12px; border-radius: 12px; 
+    border: 1px solid var(--glass-border); background: rgba(255,255,255,0.05); 
+    color: var(--title); outline: none; transition: 0.3s;
+}
+.login-input:focus { border-color: var(--accent); background: rgba(255,255,255,0.08); }
+
+/* --- NAVBAR & HANGING LAMP --- */
+.navbar {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 0 5%; height: 80px; background: var(--nav-bg);
+    position: fixed; width: 100%; top: 0; left: 0; z-index: 2001;
+    backdrop-filter: blur(10px); border-bottom: 1px solid var(--glass-border);
+}
+.logo-area { display: flex; align-items: center; gap: 12px; z-index: 2005; }
+.logo-img { width: 38px; height: 38px; object-fit: contain; }
+.logo-text { font-weight: 800; color: var(--title); font-size: 1.15rem; letter-spacing: 0.5px; }
+
+.nav-center-container { position: relative; flex: 2; display: flex; justify-content: center; align-items: center; height: 100%; }
+.nav-links { display: flex; gap: 5px; list-style: none; align-items: center; position: relative; z-index: 10; }
+.nav-item { padding: 10px 20px; cursor: pointer; font-weight: 600; border-radius: 50px; transition: 0.3s; color: var(--txt); text-decoration: none; font-size: 0.9rem; }
+.nav-item.active { color: var(--accent) !important; background: rgba(250, 204, 21, 0.1); }
+
+.hanging-lamp { 
+    position: absolute; top: -30px; width: 80px; display: flex; 
+    flex-direction: column; align-items: center; pointer-events: none; 
+    z-index: 5; transition: left 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+}
+.cable { width: 2px; height: 35px; background: var(--cable-color); }
+.white-cone { width: 30px; height: 15px; background: #fa1100; clip-path: polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%); }
+.bulb { width: 12px; height: 12px; background: var(--accent); border-radius: 50%; box-shadow: 0 0 15px var(--accent); margin-top: -3px; }
+.spotlight { width: 120px; height: 140px; background: radial-gradient(ellipse at top, var(--accent), transparent 70%); opacity: 0.15; clip-path: polygon(45% 0%, 55% 0%, 100% 100%, 0% 100%); margin-top: -2px; }
+
+/* --- USER PROFILE DROPDOWN --- */
+.user-profile-wrapper { position: relative; display: flex; align-items: center; z-index: 2005; }
+.user-avatar { 
+    width: 38px; height: 38px; border-radius: 50%; border: 2px solid var(--accent); 
+    cursor: pointer; object-fit: cover; transition: 0.3s;
+}
+.user-avatar:hover { transform: scale(1.05); box-shadow: 0 0 10px var(--accent); }
+.user-dropdown {
+    position: absolute; top: 55px; right: 0; background: var(--nav-bg);
+    border: 1px solid var(--glass-border); border-radius: 15px; padding: 15px;
+    width: 220px; display: none; flex-direction: column; text-align: center;
+    backdrop-filter: blur(15px); box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    transform: translateY(10px); opacity: 0; transition: all 0.3s ease;
+}
+.user-dropdown.show { display: flex; transform: translateY(0); opacity: 1; }
+.btn-logout { 
+    background: rgba(239, 68, 68, 0.1); color: var(--error); border: 1px solid var(--error);
+    padding: 8px; border-radius: 8px; cursor: pointer; font-weight: 700; transition: 0.3s;
+    display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 10px;
+}
+.btn-logout:hover { background: var(--error); color: white; }
+
+/* --- HERO SECTION & RING --- */
+.hero-section { 
+    padding: 140px 5% 60px;
+    display: flex; 
+    align-items: center; 
+    position: relative;
+}
+.hero-container { display: flex; align-items: center; gap: 40px; width: 100%; z-index: 5; }
+.hero-left { flex: 1.2; position: relative; }
+.badge-tag { display: inline-block; padding: 6px 16px; border: 1px solid var(--accent); color: var(--accent); border-radius: 50px; font-size: 0.8rem; margin-bottom: 15px; font-weight: 600; letter-spacing: 0.5px; }
+.hero-left h1 { font-size: clamp(2.2rem, 5vw, 4.2rem); font-weight: 900; color: var(--title); margin-bottom: 20px; line-height: 1.15; }
+.hero-left h1 span { color: var(--accent); }
+.hero-desc { opacity: 0.85; line-height: 1.7; max-width: 540px; font-size: 0.95rem; margin-bottom: 10px; }
+
+/* ANIMASI TEKS (TICKER) BAWAH BANNER */
+.info-ticker {
+    height: 30px;
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    margin-top: 15px;
+}
+.ticker-item {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    opacity: 0;
+    animation: slideFade 9s infinite;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+.ticker-item i { font-size: 1.1rem; }
+.ticker-item:nth-child(1) { animation-delay: 0s; color: var(--accent); }
+.ticker-item:nth-child(2) { animation-delay: 3s; color: var(--success); }
+.ticker-item:nth-child(3) { animation-delay: 6s; color: #38bdf8; }
+
+@keyframes slideFade {
+    0% { opacity: 0; transform: translateY(15px); }
+    10%, 25% { opacity: 1; transform: translateY(0); }
+    33%, 100% { opacity: 0; transform: translateY(-15px); }
+}
+
+.hero-right { flex: 1; display: flex; justify-content: center; perspective: 1000px; }
+.stage { position: relative; transform-style: preserve-3d; }
+.profile-center { width: var(--profile-size); height: var(--profile-size); border-radius: 50%; overflow: hidden; border: 4px solid var(--accent); position: relative; z-index: 10; box-shadow: 0 0 30px var(--ring-shadow); background: #1e293b; }
+.profile-center img { width: 100%; height: 100%; object-fit: cover; }
+.ring { position: absolute; top: 50%; left: 50%; transform-style: preserve-3d; animation: rotate3D var(--speed) linear infinite; }
+.ring span { position: absolute; color: var(--accent); font-weight: 800; font-size: 0.95rem; white-space: nowrap; transform-origin: center; text-transform: uppercase; letter-spacing: 1px; }
+
+/* --- CAROUSEL SLIDERS --- */
+.slider-header { display: flex; justify-content: space-between; align-items: center; padding: 0 5%; margin-bottom: 15px; margin-top: 40px; }
+.section-title { font-size: 1.3rem; font-weight: 800; color: var(--title); }
+.slider-nav-btns { display: flex; gap: 10px; }
+.btn-slide { background: var(--card-bg); border: 1px solid var(--glass-border); color: var(--txt); width: 38px; height: 38px; border-radius: 50%; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; }
+.btn-slide:hover { background: var(--accent); color: #000; }
+
+.carousel-container { 
+    display: flex; overflow-x: auto; gap: 20px; padding: 10px 5% 30px; 
+    scrollbar-width: none; scroll-snap-type: x mandatory; scroll-behavior: smooth;
+}
+.carousel-container::-webkit-scrollbar { display: none; }
+
+/* Layanan Card */
+.card-item { min-width: 280px; width: 280px; background: var(--card-bg); border-radius: 20px; border: 1px solid var(--glass-border); overflow: hidden; position: relative; transition: 0.3s; scroll-snap-align: start; flex-shrink: 0; }
+.card-img { width: 100%; height: 140px; background: #1e293b; object-fit: cover; }
+.card-content { padding: 20px; }
+.card-tag { position: absolute; top: 12px; left: 12px; background: var(--error); color: white; padding: 4px 12px; border-radius: 8px; font-size: 0.7rem; font-weight: 800; }
+.card-title { font-weight: 800; font-size: 1.05rem; color: var(--title); margin-bottom: 5px; }
+
+/* --- MEDIA SOSIAL SECTION --- */
+.medsos-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; padding: 10px 5% 30px;
+}
+.medsos-card {
+    background: var(--card-bg); border: 1px solid var(--glass-border); border-radius: 24px; padding: 22px;
+    backdrop-filter: blur(15px); display: flex; align-items: center; gap: 18px; text-decoration: none;
+    color: var(--txt); transition: all 0.3s ease; position: relative; overflow: hidden;
+}
+.medsos-card:hover { transform: translateY(-5px); border-color: var(--accent); box-shadow: 0 12px 30px rgba(0,0,0,0.4); }
+.medsos-icon {
+    width: 58px; height: 58px; border-radius: 18px; display: flex; align-items: center; justify-content: center;
+    font-size: 1.8rem; color: white; flex-shrink: 0; transition: transform 0.3s;
+}
+.medsos-card:hover .medsos-icon { transform: scale(1.1) rotate(5deg); }
+.icon-wa { background: #25D366; box-shadow: 0 6px 20px rgba(37, 211, 102, 0.35); }
+.icon-ig { background: linear-gradient(45deg, #f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%); box-shadow: 0 6px 20px rgba(220, 39, 67, 0.35); }
+.icon-tiktok { background: #000000; border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 6px 20px rgba(255, 255, 255, 0.15); }
+.medsos-info { flex: 1; }
+.medsos-title { font-weight: 800; font-size: 1.05rem; color: var(--title); margin-bottom: 2px; }
+.medsos-sub { font-size: 0.78rem; opacity: 0.7; font-weight: 500; }
+.medsos-arrow { font-size: 1rem; opacity: 0.5; transition: 0.3s; }
+.medsos-card:hover .medsos-arrow { opacity: 1; transform: translateX(5px); color: var(--accent); }
+
+/* --- CRM FEED & COMPLAINT CARDS --- */
+.crm-section { padding: 40px 5%; }
+.crm-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px; }
+.crm-feed { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 25px; }
+
+.crm-card {
+    background: var(--card-bg); border: 1px solid var(--glass-border); border-radius: 20px;
+    padding: 20px; backdrop-filter: blur(15px); display: flex; flex-direction: column; justify-content: space-between;
+    transition: transform 0.3s; position: relative;
+}
+.crm-card:hover { transform: translateY(-5px); }
+.crm-badge { display: inline-block; padding: 4px 12px; border-radius: 50px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; margin-bottom: 12px; width: fit-content; }
+.badge-antrian { background: rgba(239, 68, 68, 0.2); color: var(--error); border: 1px solid var(--error); }
+.badge-proses { background: rgba(245, 158, 11, 0.2); color: var(--warning); border: 1px solid var(--warning); }
+.badge-selesai { background: rgba(16, 185, 129, 0.2); color: var(--success); border: 1px solid var(--success); }
+
+.crm-img-box { display: flex; gap: 10px; margin: 12px 0; }
+.crm-img-item { flex: 1; height: 130px; border-radius: 12px; overflow: hidden; position: relative; border: 1px solid var(--glass-border); background: rgba(0,0,0,0.3); }
+.crm-img-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.crm-img-label { position: absolute; bottom: 0; inset-x: 0; background: rgba(0,0,0,0.75); color: white; font-size: 0.65rem; text-align: center; padding: 4px 0; font-weight: 700; }
+
+.response-box { background: rgba(255,255,255,0.04); border-left: 3px solid var(--accent); padding: 12px; border-radius: 8px; margin-top: 12px; font-size: 0.8rem; line-height: 1.5; }
+
+/* --- MODALS DIALOG --- */
+.custom-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 9999; justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(8px); }
+.modal-body { background: var(--bg); border: 1px solid var(--glass-border); border-radius: 25px; padding: 30px; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; }
+
+/* --- APPS GRID --- */
+.apps-section { padding: 20px 5% 100px; }
+.apps-container { background: var(--card-bg); border: 1px solid var(--glass-border); border-radius: 30px; padding: 30px; backdrop-filter: blur(10px); }
+.apps-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 25px 15px; max-height: 120px; overflow: hidden; transition: max-height 0.5s ease; }
+.apps-grid.expanded { max-height: 2000px; }
+.app-item { display: flex; flex-direction: column; align-items: center; text-decoration: none; gap: 10px; transition: 0.3s; cursor: pointer; }
+.app-item:hover .icon-box { transform: translateY(-5px); border-color: var(--accent); }
+.icon-box { width: 75px; height: 75px; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: 22px; display: flex; align-items: center; justify-content: center; position: relative; transition: 0.3s; }
+.icon-box img { width: 42px; height: 42px; object-fit: contain; }
+.app-label { font-size: 0.75rem; color: var(--txt); font-weight: 600; text-align: center; }
+
+/* --- APP VIEWER --- */
+#app-viewer { position: fixed; inset: 0; background: #000; z-index: 9999; display: none; flex-direction: column; }
+.viewer-header { height: 60px; background: var(--nav-bg); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; border-bottom: 1px solid var(--glass-border); }
+.btn-back-home { background: rgba(255,255,255,0.1); border: 1px solid var(--glass-border); color: white; padding: 8px 16px; border-radius: 10px; cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 8px; transition: 0.3s; }
+.btn-back-home:hover { background: var(--accent); color: #000; }
+#app-iframe { flex: 1; border: none; width: 100%; height: 100%; }
+
+@keyframes rotate3D { from { transform: rotateY(0deg); } to { transform: rotateY(360deg); } }
+
+/* --- BOTTOM NAV MOBILE (NATIVE APP STYLE) --- */
+.bottom-nav {
+    position: fixed; bottom: 0; left: 0; width: 100%; height: 70px;
+    background: #050810; 
+    display: none; justify-content: space-around; align-items: center;
+    border-top: 1px solid rgba(255,255,255,0.05); z-index: 2010;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.5);
+    transition: transform 0.3s;
+}
+.light-mode .bottom-nav { background: #ffffff; border-top: 1px solid #e2e8f0; }
+.bnav-item { 
+    display: flex; flex-direction: column; align-items: center; justify-content: center; 
+    text-decoration: none; color: #64748b; font-size: 0.7rem; font-weight: 600; 
+    flex: 1; height: 100%; transition: 0.3s; 
+}
+.bnav-item i { font-size: 1.4rem; margin-bottom: 5px; transition: 0.3s; }
+.bnav-item.active { color: var(--accent); }
+.bnav-item.active i { transform: scale(1.15) translateY(-2px); }
+.nav-hidden { transform: translateY(100%); }
+
+/* --- RESPONSIVE ADJUSTMENTS --- */
+@media (max-width: 900px) {
+    .nav-center-container { display: none; }
+    .bottom-nav { display: flex !important; }
+    body.logged-in { padding-bottom: 80px; }
+    .hero-container { flex-direction: column-reverse; text-align: center; gap: 30px; }
+    .hero-section { padding: 110px 5% 40px; }
+    .hero-left h1 { font-size: 2.5rem; }
+    .hero-desc { margin: 0 auto 10px; }
+    .info-ticker { margin-top: 15px; display: flex; justify-content: center; text-align: center; }
+    .ticker-item { justify-content: center; }
+    .apps-grid { grid-template-columns: repeat(4, 1fr); }
+}
+
+@media (max-width: 600px) {
+    .hero-left h1 { font-size: 2rem; }
+    :root { --profile-size: 160px; }
+    .apps-grid { grid-template-columns: repeat(3, 1fr); }
+    .icon-box { width: 65px; height: 65px; }
+    .icon-box img { width: 36px; height: 36px; }
+    .card-item { min-width: 250px; width: 250px; }
+    .login-content { padding: 30px 20px; }
+    .medsos-grid { grid-template-columns: 1fr; }
+}
+    </style>
+</head>
+<body class="dark-mode">
+
+    <!-- 1. LOADING SCREEN -->
+    <div id="loader">
+        <img src="logoappis.png" class="loader-logo" alt="Logo APPIS" onerror="this.src='https://cdn-icons-png.flaticon.com/512/1042/1042339.png'">
+        <div class="loader-bar"><div class="loader-progress" id="progress"></div></div>
+        <p style="margin-top:15px; font-size:0.65rem; letter-spacing:4px; opacity:0.8; font-weight:800; color:white;">APPIS MOBILE - PISANGAN BARU</p>
+    </div>
+
+    <!-- 2. LOGIN MODAL -->
+    <div id="loginSection" class="login-modal">
+        <div class="login-content">
+            <img src="logoappis.png" class="login-logo" alt="Logo APPIS" onerror="this.src='https://cdn-icons-png.flaticon.com/512/1042/1042339.png'">
+            <h2 style="font-weight:800; color:var(--title); font-size: 1.5rem;">APPIS MOBILE</h2>
+            <p style="font-size:0.85rem; opacity:0.7; margin-bottom:20px; color:var(--txt);">Silakan Login Akun Anda</p>
+
+            <form id="loginForm" onsubmit="handleAdminLogin(event)">
+                <input type="email" id="username" class="login-input" placeholder="Masukkan Email Akun" required>
+                <input type="password" id="password" class="login-input" placeholder="Masukkan Password" required>
+                <button type="submit" id="btnLoginSubmit" class="btn-3d" style="background:var(--accent); color:#000; box-shadow: 0 4px 0 #b49410; margin-top: 10px;">MASUK </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 3. MAIN DASHBOARD CONTENT -->
+    <div id="main-content">
+        <!-- NAVBAR -->
+        <nav class="navbar">
+            <div class="logo-area">
+                <img src="logoappis.png" alt="Logo" class="logo-img" onerror="this.src='https://cdn-icons-png.flaticon.com/512/1042/1042339.png'">
+                <span class="logo-text">APPIS MOBILE</span>
+            </div>
+            
+            <div class="nav-center-container">
+                <div id="lamp-indicator" class="hanging-lamp">
+                    <div class="cable"></div><div class="white-cone"></div><div class="bulb"></div><div class="spotlight"></div>
+                </div>
+                <ul class="nav-links" id="nav-links">
+                    <li><a href="#" class="nav-item active" onclick="handleNavClick(event, this)">Beranda</a></li>
+                    <li><a href="#projects" class="nav-item" onclick="handleNavClick(event, this)">Kegiatan</a></li>
+                    <li><a href="#crm" class="nav-item" onclick="handleNavClick(event, this)">CRM Laporan</a></li>
+                    <li><a href="#medsos" class="nav-item" onclick="handleNavClick(event, this)">Medsos</a></li>
+                    <li><a href="#tools" class="nav-item" onclick="handleNavClick(event, this)">Modul</a></li>
+                </ul>
+            </div>
+
+            <div class="nav-right" style="display:flex; gap:20px; align-items:center;">
+                <div id="mode-toggle" style="cursor:pointer; font-size: 1.3rem;"><i class="fas fa-moon"></i></div>
+                
+                <div class="user-profile-wrapper" id="profile-btn">
+                    <img src="admin.jpg" alt="User" class="user-avatar" id="avatar-img" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3135/3135715.png'">
+                    <div class="user-dropdown" id="user-dropdown">
+                        <p id="userDisplayName" style="font-size:0.85rem; font-weight:bold; color:var(--title); margin-bottom:3px;">Petugas PPSU</p>
+                        <p id="userDisplayRole" style="font-size:0.7rem; color:var(--accent); font-weight:600;">Tim Lapangan</p>
+                        <button class="btn-logout" onclick="handleLogout(event)">
+                            <i class="fas fa-sign-out-alt"></i> Keluar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- HERO SECTION -->
+        <section class="hero-section">
+            <div class="hero-container">
+                <div class="hero-left">
+                    <div class="badge-tag">Kelurahan Pisangan Baru</div>
+                    <h1>Aplikasi <span>PPSU</span> Pisangan Baru</h1>
+                    <p class="hero-desc">APPIS MOBILE Sistem manajemen operasional, pelaporan pengaduan Koordinasi untuk warga dan PPSU real-time, jadwal permintaan layanan, dan pemantauan tindak lanjut petugas PPSU Kelurahan Pisangan Baru.</p>
+                    
+                    <!-- ANIMASI TEXT TICKER -->
+                    <div class="info-ticker">
+                        <div class="ticker-item"><i class="fas fa-bolt"></i> Siaga Merespon Layanan Warga 24 Jam</div>
+                        <div class="ticker-item"><i class="fas fa-leaf"></i> Menjaga Lingkungan Pisbar Tetap Asri</div>
+                        <div class="ticker-item"><i class="fas fa-bullhorn"></i> Transparansi Tindak Lanjut Terpantau</div>
+                    </div>
+
+                </div>
+                <div class="hero-right">
+                    <div class="stage">
+                        <div class="profile-center">
+                            <img src="logoappis.png" alt="Profile" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3135/3135715.png'">
+                        </div>
+                        <div id="ring" class="ring"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CAROUSEL 1: LAYANAN & PROGRAM OPERASIONAL -->
+        <div class="slider-header" id="projects">
+            <div>
+                <h2 class="section-title">Bidang Operasional</h2>
+                <span style="font-size: 0.75rem; opacity: 0.5; font-weight: 600;">Fokus Utama Penanganan Wilayah</span>
+            </div>
+            <div class="slider-nav-btns">
+                <button id="layanan-prev" class="btn-slide"><i class="fas fa-chevron-left"></i></button>
+                <button id="layanan-next" class="btn-slide"><i class="fas fa-chevron-right"></i></button>
+            </div>
+        </div>
+        
+        <div class="carousel-container" id="layanan-slider">
+            <div class="card-item">
+                <span class="card-tag">Rutin</span>
+                <div class="card-img" style="background: url('gambar1.jpeg') center/cover, #1e293b;"></div>
+                <div class="card-content">
+                    <h3 class="card-title">Penanganan Kebersihan</h3>
+                    <p style="font-size:0.8rem; opacity:0.6;">Penyapuan Jalan & Wilayah • Harian</p>
+                </div>
+            </div>
+            <div class="card-item">
+                <span class="card-tag" style="background:var(--success);">Siaga</span>
+                <div class="card-img" style="background: url('gambar2.jpeg') center/cover, #1e293b;"></div>
+                <div class="card-content">
+                    <h3 class="card-title">Pemeliharaan Saluran</h3>
+                    <p style="font-size:0.8rem; opacity:0.6;">Pengerukan Got & Drainase • Fast Response</p>
+                </div>
+            </div>
+            <div class="card-item">
+                <span class="card-tag">Periodik</span>
+                <div class="card-img" style="background: url('gambar3.jpeg') center/cover, #1e293b;"></div>
+                <div class="card-content">
+                    <h3 class="card-title">Penataan Taman</h3>
+                    <p style="font-size:0.8rem; opacity:0.6;">Penghijauan & Pemangkasan Pohon</p>
+                </div>
+            </div>
+            <div class="card-item">
+                <span class="card-tag">Khusus</span>
+                <div class="card-img" style="background: url('gambar4.jpeg') center/cover, #1e293b;"></div>
+                <div class="card-content">
+                    <h3 class="card-title">Penanganan Pengangkutan Sampah</h3>
+                    <p style="font-size:0.8rem; opacity:0.6;">Tim Respon Cepat</p>
+                </div>
+            </div>
+            <div class="card-item">
+                <span class="card-tag">Inovasi</span>
+                <div class="card-img" style="background: url('gambar5.jpeg') center/cover, #1e293b;"></div>
+                <div class="card-content">
+                    <h3 class="card-title">Pilah Sampah Pisbar</h3>
+                    <p style="font-size:0.8rem; opacity:0.6;">Bank Sampah & Edukasi Warga</p>
+                </div>
+            </div>
+            <div class="card-item">
+                <span class="card-tag">Fasilitas</span>
+                <div class="card-img" style="background: url('gambar6.jpeg') center/cover, #1e293b;"></div>
+                <div class="card-content">
+                    <h3 class="card-title">Perbaikan Sarpras</h3>
+                    <p style="font-size:0.8rem; opacity:0.6;">Pengecatan & Pemeliharaan Fasum</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- CRM PENGADUAN & LAYANAN WARGA SECTION -->
+        <section class="crm-section" id="crm">
+            <div class="crm-header">
+                <div>
+                    <h2 style="font-size: 1.5rem; font-weight: 800; color: var(--title);">CRM Pengaduan & Layanan Warga</h2>
+                    <p style="font-size: 0.8rem; opacity: 0.6;">Transparansi Penanganan Wilayah oleh Petugas PPSU</p>
+                </div>
+                <button class="btn-3d" onclick="openCreateComplaintModal()" style="background:var(--accent); color:#000; width:auto; padding:10px 20px;">
+                    <i class="fas fa-plus"></i> Buat Laporan Pengaduan
+                </button>
+            </div>
+
+            <!-- FEED CARDS PENGADUAN -->
+            <div class="crm-feed" id="crmFeed">
+                <!-- Data dinamis akan dimuat oleh JS -->
+            </div>
+        </section>
+
+        <!-- MEDIA SOSIAL & KONTAK DIRECT -->
+        <div class="slider-header" id="medsos" style="margin-top: 20px;">
+            <div>
+                <h2 class="section-title">Media Sosial & Kontak Resmi</h2>
+                <span style="font-size: 0.75rem; opacity: 0.5; font-weight: 600;">Hubungi & Ikuti Saluran Resmi Kelurahan Pisangan Baru</span>
+            </div>
+        </div>
+
+        <div class="medsos-grid">
+            <a href="https://wa.me/62895637243864?text=Halo%20Tim%20PPSU%20Pisangan%20Baru,%20saya%20ingin%20mengirim%20informasi" target="_blank" class="medsos-card">
+                <div class="medsos-icon icon-wa"><i class="fab fa-whatsapp"></i></div>
+                <div class="medsos-info">
+                    <h4 class="medsos-title">Hub WhatsApp </h4>
+                    <p class="medsos-sub">Layanan pesan & tanggap cepat</p>
+                </div>
+                <i class="fas fa-arrow-right medsos-arrow"></i>
+            </a>
+
+            <a href="https://www.instagram.com/ppsu_pisanganbaru" target="_blank" class="medsos-card">
+                <div class="medsos-icon icon-ig"><i class="fab fa-instagram"></i></div>
+                <div class="medsos-info">
+                    <h4 class="medsos-title">Instagram Resmi</h4>
+                    <p class="medsos-sub">@ppsu_pisanganbaru</p>
+                </div>
+                <i class="fas fa-arrow-right medsos-arrow"></i>
+            </a>
+
+            <a href="https://www.tiktok.com/@ppsu_pisbar" target="_blank" class="medsos-card">
+                <div class="medsos-icon icon-tiktok"><i class="fab fa-tiktok"></i></div>
+                <div class="medsos-info">
+                    <h4 class="medsos-title">TikTok Official</h4>
+                    <p class="medsos-sub">Dokumentasi kegiatan lapangan</p>
+                </div>
+                <i class="fas fa-arrow-right medsos-arrow"></i>
+            </a>
+        </div>
+
+        <!-- GRID APPS & OPERASIONAL TOOLS -->
+        <section class="apps-section" id="tools">
+            <div class="apps-container">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px;">
+                    <h3 class="section-title">Fitur & Sub-Aplikasi</h3>
+                    <button class="btn-see-all" id="btn-see-all" style="background:rgba(16,185,129,0.1); border:none; color:var(--success); padding:8px 16px; border-radius:50px; font-weight:700; cursor:pointer;">Lihat Semua</button>
+                </div>
+                
+                <div class="apps-grid" id="apps-grid">
+                    <a href="ppsu_laporan.html" class="app-item">
+                        <div class="icon-box"><img src="letter.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3209/3209265.png'"></div>
+                        <span class="app-label">Laporan Harian</span>
+                    </a>
+                    <a href="job.html" class="app-item">
+                        <div class="icon-box"><img src="job.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3652/3652191.png'"></div>
+                        <span class="app-label">Jadwal</span>
+                    </a>
+                    <a href="appkelurahan.html" class="app-item">
+                        <div class="icon-box"><img src="ikonlayanan.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/1042/1042339.png'"></div>
+                        <span class="app-label">Scanner Surat</span>
+                    </a>
+                    <a href="presensi.html" class="app-item">
+                        <div class="icon-box"><img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png"></div>
+                        <span class="app-label">Arsip Digital</span>
+                    </a>
+                    <a href="pilahsampah.html" class="app-item">
+                        <div class="icon-box"><img src="e-commeerce.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3299/3299935.png'"></div>
+                        <span class="app-label">Pilah Sampah</span>
+                    </a>
+                    <a href="earsip.html" class="app-item">
+                        <div class="icon-box"><img src="cyber.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2991/2991112.png'"></div>
+                        <span class="app-label">Siska</span>
+                    </a>
+                    <a href="aielfida.html" class="app-item">
+                        <div class="icon-box"><img src="ai.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/8649/8649595.png'"></div>
+                        <span class="app-label">APPIS Assistant</span>
+                    </a>
+                    <a href="https://youtube.com/@elfidachannel" class="app-item" target="_blank">
+                        <div class="icon-box"><img src="youtube.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/1384/1384060.png'"></div>
+                        <span class="app-label">Dokumentasi YT</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- MODAL 1: FORM BUAT PENGADUAN WARGA -->
+    <div class="custom-modal" id="modalCreateComplaint">
+        <div class="modal-body">
+            <h3 style="margin-bottom:15px; color:var(--title);">Form Pengaduan Warga</h3>
+            <form id="formCreateComplaint" onsubmit="submitComplaint(event)">
+                <input type="text" id="cmpNama" class="login-input" placeholder="Nama Pelapor Lengkap" required>
+                <input type="tel" id="cmpWa" class="login-input" placeholder="Nomor WhatsApp" required>
+                
+                <input type="text" id="cmpRw" class="login-input" placeholder="Tuliskan Lokasi (Contoh: RW 02 / RT 04)" required>
+                <input type="text" id="cmpKategori" class="login-input" placeholder="Kategori Permintaan (Contoh: Saluran Air / Sampah)" required>
+                
+                <label style="font-size:0.75rem; opacity:0.7; display:block; margin-bottom:5px;">Atur Jadwal Permintaan Ditangani:</label>
+                <input type="datetime-local" id="cmpJadwal" class="login-input" style="background:rgba(255,255,255,0.05); color:white;" required>
+                
+                <textarea id="cmpDeskripsi" class="login-input" placeholder="Deskripsi Detail Permintaan / Masalah" rows="3" required></textarea>
+                
+                <label style="font-size:0.75rem; opacity:0.7; display:block; margin-bottom:5px;">Unggah Foto Lokasi Kejadian:</label>
+                <input type="file" id="cmpFoto" class="login-input" accept="image/*" required>
+                
+                <div style="display:flex; gap:10px; margin-top:10px;">
+                    <button type="submit" id="btnSubmitCmp" class="btn-3d" style="background:var(--accent); color:#000;">KIRIM LAPORAN</button>
+                    <button type="button" class="btn-3d" onclick="closeModal('modalCreateComplaint')" style="background:rgba(255,255,255,0.1); color:white;">BATAL</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 2: TANGGAPI PENGADUAN -->
+    <div class="custom-modal" id="modalRespondComplaint">
+        <div class="modal-body">
+            <h3 style="margin-bottom:15px; color:var(--title);">Tindak Lanjut Pengaduan</h3>
+            <form id="formRespondComplaint" onsubmit="submitResponse(event)">
+                <input type="hidden" id="rspId">
+                <select id="rspStatus" class="login-input" style="background:rgba(255,255,255,0.05); color:white;" required>
+                    <option value="Dalam Proses Penanganan">Dalam Proses Penanganan</option>
+                    <option value="Selesai Ditangani">Selesai Ditangani</option>
+                </select>
+                <textarea id="rspTanggapan" class="login-input" placeholder="Tuliskan Catatan/Balasan Tanggapan Resmi Petugas PPSU..." rows="3" required></textarea>
+                <label style="font-size:0.75rem; opacity:0.7; display:block; margin-bottom:5px;">Foto Bukti Hasil Tindak Lanjut Lapangan:</label>
+                <input type="file" id="rspFoto" class="login-input" accept="image/*">
+                
+                <div style="display:flex; gap:10px; margin-top:10px;">
+                    <button type="submit" id="btnSubmitRsp" class="btn-3d" style="background:var(--success); color:#fff;">SIMPAN TANGGAPAN</button>
+                    <button type="button" class="btn-3d" onclick="closeModal('modalRespondComplaint')" style="background:rgba(255,255,255,0.1); color:white;">BATAL</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 4. APP VIEWER IFRAME MODAL -->
+    <div id="app-viewer">
+        <div class="viewer-header">
+            <button class="btn-back-home" onclick="closeApp()">
+                <i class="fas fa-arrow-left"></i> Kembali ke Dashboard
+            </button>
+            <span style="font-size:0.8rem; opacity:0.7; font-weight:600; color:white;">APPIS Sub-Portal</span>
+        </div>
+        <iframe id="app-iframe" title="Frame Aplikasi"></iframe>
+    </div>
+
+    <!-- 5. BOTTOM NAVIGATION FOR MOBILE -->
+    <nav class="bottom-nav" id="mobile-nav">
+        <a href="#" class="bnav-item active" onclick="handleBNav(this)"><i class="fas fa-house"></i><span>Beranda</span></a>
+        <a href="#projects" class="bnav-item" onclick="handleBNav(this)"><i class="fas fa-layer-group"></i><span>Program</span></a>
+        <a href="#crm" class="bnav-item" onclick="handleBNav(this)"><i class="fas fa-comments"></i><span>CRM</span></a>
+        <a href="#medsos" class="bnav-item" onclick="handleBNav(this)"><i class="fas fa-share-nodes"></i><span>Medsos</span></a>
+        <a href="#tools" class="bnav-item" onclick="handleBNav(this)"><i class="fas fa-border-all"></i><span>Modul</span></a>
+    </nav>
+
+    <!-- JS LOGIC INTEGRATED -->
+    <script>
+        // --- API GOOGLE APPS SCRIPT DATABASE ---
+        const GAS_API_URL = "https://script.google.com/macros/s/AKfycbxUjkTm0q5s2B6NgO-Zwk0tcqiCRgsFZIBtXZzne7vhz39R-ABGUiGYcs-lSjCYekpmLg/exec";
+
+        let localComplaints = [];
+
+        // --- 1. LOADING SYSTEM ---
+        const progress = document.getElementById('progress');
+        const loader = document.getElementById('loader');
+        let width = 0;
+        let loadInterval = setInterval(() => {
+            if (width >= 100) {
+                clearInterval(loadInterval);
+                setTimeout(() => {
+                    loader.style.opacity = '0';
+                    setTimeout(() => loader.style.display = 'none', 500);
+                }, 400);
+            } else {
+                width += 10;
+                progress.style.width = width + '%';
+            }
+        }, 30);
+
+        // --- 2. LOGIN & SESSION HANDLING (SECURE BACKEND HASHING) ---
+        async function handleAdminLogin(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btnLoginSubmit');
+            const u = document.getElementById('username').value.trim();
+            const p = document.getElementById('password').value.trim();
+
+            if (!u || !p) {
+                alert("Silakan isi Email dan Password!");
+                return;
+            }
+
+            btn.innerText = "VERIFIKASI...";
+            btn.disabled = true;
+
+            try {
+                const response = await fetch(GAS_API_URL, {
+                    method: "POST",
+                    headers: { "Content-Type": "text/plain" },
+                    body: JSON.stringify({ action: "login", email: u, password: p })
+                });
+                
+                const resData = await response.json();
+                
+                if (resData.status === "success") {
+                    successLogin(resData.user);
+                } else {
+                    alert(resData.message || "Email atau Password Salah!");
+                }
+            } catch (err) {
+                console.error("Gagal terhubung ke server:", err);
+                alert("Gagal terhubung ke server backend! Pastikan koneksi internet stabil atau URL Apps Script sudah benar.");
+            } finally {
+                btn.innerText = "MASUK";
+                btn.disabled = false;
+            }
+        }
+
+        function successLogin(userData) {
+            sessionStorage.setItem('isLoggedIn', 'true');
+            sessionStorage.setItem('userData', JSON.stringify(userData || {}));
+            
+            document.getElementById('loginSection').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('loginSection').style.display = 'none';
+                showMainContent(userData);
+            }, 500);
+        }
+
+        function showMainContent(user) {
+            document.getElementById('main-content').style.display = 'block';
+            document.body.classList.add('logged-in');
+
+            if (user) {
+                if(user.nama) document.getElementById('userDisplayName').innerText = user.nama;
+                if(user.role) document.getElementById('userDisplayRole').innerText = user.role;
+            }
+
+            initRing();
+            fetchComplaints();
+
+            if(window.innerWidth > 900) {
+                setTimeout(() => {
+                    const activeItem = document.querySelector('.nav-item.active');
+                    if(activeItem) moveLamp(activeItem);
+                }, 100);
+            }
+        }
+
+        window.onload = () => {
+            if(sessionStorage.getItem('isLoggedIn') === 'true') {
+                const savedUser = JSON.parse(sessionStorage.getItem('userData') || '{}');
+                showMainContent(savedUser);
+            }
+        };
+
+        function handleLogout(e) {
+            if(e) e.stopPropagation(); 
+            if(confirm("Keluar dari sistem APPIS?")) {
+                sessionStorage.removeItem('isLoggedIn');
+                sessionStorage.removeItem('userData');
+                
+                const userDropdown = document.getElementById('user-dropdown');
+                userDropdown.classList.remove('show');
+                userDropdown.style.display = 'none';
+                
+                document.getElementById('main-content').style.display = 'none';
+                document.body.classList.remove('logged-in');
+                
+                const loginSection = document.getElementById('loginSection');
+                loginSection.style.display = 'flex';
+                setTimeout(() => { loginSection.style.opacity = '1'; }, 50);
+            }
+        }
+
+        const profileBtn = document.getElementById('profile-btn');
+        const userDropdown = document.getElementById('user-dropdown');
+        if(profileBtn) {
+            profileBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                userDropdown.style.display = 'flex';
+                setTimeout(() => userDropdown.classList.toggle('show'), 10);
+            });
+        }
+        document.addEventListener('click', (e) => {
+            if (profileBtn && !profileBtn.contains(e.target)) {
+                userDropdown.classList.remove('show');
+                setTimeout(() => { if(!userDropdown.classList.contains('show')) userDropdown.style.display = 'none'; }, 300);
+            }
+        });
+
+        // --- 3. NAVIGATION & HANGING LAMP ---
+        const lamp = document.getElementById('lamp-indicator');
+        function moveLamp(el) {
+            if (!lamp || window.innerWidth <= 900) return;
+            const container = document.querySelector('.nav-center-container');
+            if(!container) return;
+            const containerRect = container.getBoundingClientRect();
+            const elRect = el.getBoundingClientRect(); 
+            const center = (elRect.left - containerRect.left) + (elRect.width / 2);
+            lamp.style.left = (center - 40) + "px"; 
+        }
+
+        function handleNavClick(e, el) {
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            el.classList.add('active');
+            moveLamp(el);
+        }
+        function handleBNav(el) {
+            document.querySelectorAll('.bnav-item').forEach(i => i.classList.remove('active'));
+            el.classList.add('active');
+        }
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 900) {
+                const activeItem = document.querySelector('.nav-item.active');
+                if (activeItem) moveLamp(activeItem);
+            }
+            initRing();
+        });
+
+        // --- 4. CRM PENGADUAN & TINDAK LANJUT ---
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                if(!file) resolve("");
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+        }
+
+        async function fetchComplaints() {
+            try {
+                const res = await fetch(GAS_API_URL + "?action=getComplaints");
+                if (res.ok) {
+                    const result = await res.json();
+                    if (result && result.status === "success" && Array.isArray(result.data)) {
+                        localComplaints = result.data;
+                    }
+                }
+            } catch (err) {
+                console.warn("Gagal terhubung ke Apps Script, menampilkan status lokal:", err);
+            }
+            renderComplaints();
+        }
+
+        function renderComplaints() {
+            const feed = document.getElementById('crmFeed');
+            if(!localComplaints || localComplaints.length === 0) {
+                feed.innerHTML = `
+                <div style="grid-column: 1/-1; text-align: center; padding: 40px; border: 1px dashed var(--glass-border); border-radius: 20px; background: rgba(255,255,255,0.02);">
+                    <i class="fas fa-folder-open" style="font-size: 3rem; color: var(--accent); margin-bottom: 15px; opacity: 0.5;"></i>
+                    <h3 style="color: var(--title); font-size: 1.1rem; margin-bottom: 5px;">Belum Ada Data Masuk</h3>
+                    <p style="opacity: 0.6; font-size: 0.85rem;">Belum ada laporan pengaduan warga atau permohonan layanan yang tercatat.</p>
+                </div>`;
+                return;
+            }
+
+            feed.innerHTML = localComplaints.map(item => {
+                let badgeClass = "badge-antrian";
+                const st = (item.status || "").toLowerCase();
+                if(st.includes("proses")) badgeClass = "badge-proses";
+                if(st.includes("selesai")) badgeClass = "badge-selesai";
+                
+                const fotoUtama = item.fotoLokasi || item.fotoLaporan || "https://via.placeholder.com/300x200?text=Foto+Laporan";
+
+                return `
+                    <div class="crm-card">
+                        <div>
+                            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                                <span class="crm-badge ${badgeClass}">${item.status || 'Dalam Antrian'}</span>
+                                <span style="font-size:0.7rem; opacity:0.6;">${item.tanggal || ''}</span>
+                            </div>
+                            <h4 style="color:var(--title); font-size:1.05rem; margin-bottom:4px;">${item.kategori || 'Pengaduan Warga'}</h4>
+                            <p style="font-size:0.75rem; color:var(--accent); font-weight:700; margin-bottom:8px;">
+                                <i class="fas fa-map-marker-alt"></i> ${item.lokasiRw || item.rw || 'Pisangan Baru'} • Pelapor: ${item.nama}
+                            </p>
+                            <p style="font-size:0.82rem; opacity:0.85; line-height:1.5;">${item.deskripsi}</p>
+                            <p style="font-size:0.72rem; opacity:0.6; margin-top:6px;">
+                                <i class="fas fa-clock"></i> Jadwal: ${item.jadwalPermintaan || item.jadwal ? (item.jadwalPermintaan || item.jadwal).replace('T', ' ') : '-'}
+                            </p>
+
+                            <div class="crm-img-box">
+                                <div class="crm-img-item">
+                                    <img src="${fotoUtama}" alt="Foto Laporan" onerror="this.src='https://via.placeholder.com/300x200?text=Foto+Laporan'">
+                                    <div class="crm-img-label">Lokasi Kejadian</div>
+                                </div>
+                                ${item.fotoTindakLanjut ? `
+                                <div class="crm-img-item">
+                                    <img src="${item.fotoTindakLanjut}" alt="Foto Hasil PPSU" onerror="this.src='https://via.placeholder.com/300x200?text=Foto+Tindak+Lanjut'">
+                                    <div class="crm-img-label" style="background:rgba(16,185,129,0.85);">Hasil PPSU</div>
+                                </div>
+                                ` : ''}
+                            </div>
+
+                            ${item.tanggapan ? `
+                            <div class="response-box">
+                                <strong><i class="fas fa-user-shield"></i> Respon Petugas PPSU:</strong>
+                                <p style="margin-top:4px;">${item.tanggapan}</p>
+                            </div>
+                            ` : ''}
+                        </div>
+
+                        <button class="btn-3d" onclick="openRespondModal('${item.id}')" style="background:rgba(250,204,21,0.15); color:var(--accent); border:1px solid var(--accent); margin-top:15px; font-size:0.8rem; padding:8px;">
+                            <i class="fas fa-reply"></i> Tindak Lanjut / Tanggapi
+                        </button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function openCreateComplaintModal() { document.getElementById('modalCreateComplaint').style.display = 'flex'; }
+        function openRespondModal(id) {
+            document.getElementById('rspId').value = id;
+            document.getElementById('modalRespondComplaint').style.display = 'flex';
+        }
+        function closeModal(modalId) { document.getElementById(modalId).style.display = 'none'; }
+
+        async function submitComplaint(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btnSubmitCmp');
+            btn.innerText = "MENGIRIM...";
+            btn.disabled = true;
+
+            try {
+                const fotoFile = document.getElementById('cmpFoto').files[0];
+                const base64Foto = await fileToBase64(fotoFile);
+
+                const payload = {
+                    action: "createComplaint",
+                    nama: document.getElementById('cmpNama').value,
+                    noWa: document.getElementById('cmpWa').value,
+                    lokasiRw: document.getElementById('cmpRw').value,
+                    kategori: document.getElementById('cmpKategori').value,
+                    jadwalPermintaan: document.getElementById('cmpJadwal').value,
+                    deskripsi: document.getElementById('cmpDeskripsi').value,
+                    fotoLokasiBase64: base64Foto,
+                    userEmail: "warga@pisanganbaru.id"
+                };
+
+                const newCard = {
+                    id: "LPR-" + Math.floor(1000 + Math.random() * 9000),
+                    ...payload,
+                    fotoLokasi: base64Foto || "https://via.placeholder.com/300x200?text=Foto+Laporan",
+                    status: "Belum Ditanggapi (Dalam Antrian)",
+                    tanggapan: "",
+                    fotoTindakLanjut: "",
+                    tanggal: new Date().toLocaleDateString('id-ID')
+                };
+
+                localComplaints.unshift(newCard);
+                renderComplaints();
+                closeModal('modalCreateComplaint');
+                document.getElementById('formCreateComplaint').reset();
+                
+                await fetch(GAS_API_URL, {
+                    method: "POST",
+                    headers: { "Content-Type": "text/plain" },
+                    body: JSON.stringify(payload)
+                });
+            } catch (err) {
+                console.warn("Disimpan secara lokal:", err);
+            } finally {
+                btn.innerText = "KIRIM LAPORAN";
+                btn.disabled = false;
+            }
+        }
+
+        async function submitResponse(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btnSubmitRsp');
+            btn.innerText = "MENYIMPAN...";
+            btn.disabled = true;
+
+            try {
+                const targetId = document.getElementById('rspId').value;
+                const status = document.getElementById('rspStatus').value;
+                const tanggapan = document.getElementById('rspTanggapan').value;
+                const fotoFile = document.getElementById('rspFoto').files[0];
+                const base64Foto = await fileToBase64(fotoFile);
+
+                const payload = { 
+                    action: "respondComplaint", 
+                    id: targetId, 
+                    status: status, 
+                    tanggapan: tanggapan, 
+                    fotoTindakLanjutBase64: base64Foto 
+                };
+
+                const item = localComplaints.find(c => c.id === targetId);
+                if (item) {
+                    item.status = status;
+                    item.tanggapan = tanggapan;
+                    if(base64Foto) item.fotoTindakLanjut = base64Foto;
+                }
+
+                renderComplaints();
+                closeModal('modalRespondComplaint');
+                document.getElementById('formRespondComplaint').reset();
+                
+                await fetch(GAS_API_URL, {
+                    method: "POST",
+                    headers: { "Content-Type": "text/plain" },
+                    body: JSON.stringify(payload)
+                });
+            } catch(err) {
+                console.warn("Tanggapan diperbarui lokal:", err);
+            } finally {
+                btn.innerText = "SIMPAN TANGGAPAN";
+                btn.disabled = false;
+            }
+        }
+
+        // --- 5. APP VIEWER ---
+        function openApp(url) {
+            const v = document.getElementById('app-viewer');
+            const f = document.getElementById('app-iframe');
+            const b = document.getElementById('mobile-nav');
+            
+            f.src = url;
+            v.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+            if(b) b.classList.add('nav-hidden');
+
+            history.pushState({ inAppViewer: true }, "", "#sub-app");
+        }
+        function closeApp() {
+            const v = document.getElementById('app-viewer');
+            const b = document.getElementById('mobile-nav');
+            if (v && v.style.display === 'flex') {
+                v.style.display = 'none';
+                document.getElementById('app-iframe').src = '';
+                document.body.style.overflow = 'auto';
+                if(b) b.classList.remove('nav-hidden');
+                if (history.state && history.state.inAppViewer) { history.back(); }
+            }
+        }
+        window.addEventListener('popstate', function(event) {
+            const v = document.getElementById('app-viewer');
+            if (v && v.style.display === 'flex') {
+                v.style.display = 'none';
+                document.getElementById('app-iframe').src = '';
+                document.body.style.overflow = 'auto';
+                const b = document.getElementById('mobile-nav');
+                if(b) b.classList.remove('nav-hidden');
+            }
+        });
+        document.querySelectorAll('.app-item').forEach(item => {
+            item.onclick = function(e) {
+                const url = this.getAttribute('href');
+                if (url && url !== '#' && !url.startsWith('http')) {
+                    e.preventDefault();
+                    openApp(url);
+                }
+            };
+        });
+
+        // --- 6. TOGGLES & MISC ---
+        document.getElementById('btn-see-all').onclick = function() {
+            const g = document.getElementById('apps-grid');
+            g.classList.toggle('expanded');
+            this.innerText = g.classList.contains('expanded') ? 'Sembunyikan' : 'Lihat Semua';
+        };
+        document.getElementById('mode-toggle').onclick = function() {
+            document.body.classList.toggle('light-mode');
+            this.innerHTML = document.body.classList.contains('light-mode') ? 
+                '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+        };
+
+        // --- 7. TEXT MELINGKAR 3D ---
+        function initRing() {
+            const ring = document.getElementById('ring');
+            if(!ring) return;
+            const text = "PPSU • PISANGAN BARU • MATRAMAN • JAKARTA TIMUR • APPIS • ";
+            const radius = window.innerWidth < 600 ? 110 : (window.innerWidth < 900 ? 140 : 175); 
+            
+            ring.innerHTML = "";
+            text.split("").forEach((char, i) => {
+                const span = document.createElement("span");
+                span.innerText = char;
+                const angle = (i / text.length) * 360;
+                span.style.transform = `rotateY(${angle}deg) translateZ(${radius}px)`;
+                ring.appendChild(span);
+            });
+        }
+
+        // --- 8. CAROUSEL AUTO SCROLL LOGIC ---
+        const layananSlider = document.getElementById('layanan-slider');
+        const btnPrev = document.getElementById('layanan-prev');
+        const btnNext = document.getElementById('layanan-next');
+        let autoScrollInterval;
+
+        if (layananSlider && btnPrev && btnNext) {
+            const scrollAmount = 300;
+            const scrollNext = () => {
+                if (layananSlider.scrollLeft + layananSlider.clientWidth >= layananSlider.scrollWidth - 10) {
+                    layananSlider.scrollTo({ left: 0, behavior: 'smooth' });
+                } else {
+                    layananSlider.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+                }
+            };
+            const scrollPrev = () => { layananSlider.scrollBy({ left: -scrollAmount, behavior: 'smooth' }); };
+            const startAutoScroll = () => { autoScrollInterval = setInterval(scrollNext, 3000); };
+            const stopAutoScroll = () => { clearInterval(autoScrollInterval); };
+
+            btnNext.addEventListener('click', () => { scrollNext(); stopAutoScroll(); startAutoScroll(); });
+            btnPrev.addEventListener('click', () => { scrollPrev(); stopAutoScroll(); startAutoScroll(); });
+
+            layananSlider.addEventListener('mouseenter', stopAutoScroll);
+            layananSlider.addEventListener('mouseleave', startAutoScroll);
+            layananSlider.addEventListener('touchstart', stopAutoScroll, {passive: true});
+            layananSlider.addEventListener('touchend', startAutoScroll);
+
+            startAutoScroll();
+        }
+    </script>
+</body>
+</html>
