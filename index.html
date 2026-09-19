@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>APPIS | PPSU Pisangan Baru</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
@@ -50,7 +50,7 @@
 body { 
     background-color: var(--bg); 
     color: var(--txt); 
-    transition: 0.5s; 
+    transition: background-color 0.5s, color 0.5s; 
     overflow-x: hidden; 
     width: 100%; 
 }
@@ -370,14 +370,15 @@ body {
                 </div>
                 <ul class="nav-links" id="nav-links">
                     <li><a href="#" class="nav-item active" onclick="handleNavClick(event, this)">Beranda</a></li>
-                    <li><a href="#projects" class="nav-item" onclick="handleNavClick(event, this)">Kegiatan</a></li>
-                    <li><a href="#crm" class="nav-item" onclick="handleNavClick(event, this)">CRM Laporan</a></li>
+                    <li><a href="#projects" class="nav-item" onclick="handleNavClick(event, this)">Aktivitas</a></li>
+                    <li><a href="#crm" class="nav-item" onclick="handleNavClick(event, this)">CRM Layanan Warga</a></li>
                     <li><a href="#medsos" class="nav-item" onclick="handleNavClick(event, this)">Medsos</a></li>
                     <li><a href="#tools" class="nav-item" onclick="handleNavClick(event, this)">Modul</a></li>
                 </ul>
             </div>
 
             <div class="nav-right" style="display:flex; gap:20px; align-items:center;">
+                <!-- TOMBOL MODE GELAP/TERANG -->
                 <div id="mode-toggle" style="cursor:pointer; font-size: 1.3rem;"><i class="fas fa-moon"></i></div>
                 
                 <div class="user-profile-wrapper" id="profile-btn">
@@ -399,12 +400,12 @@ body {
                 <div class="hero-left">
                     <div class="badge-tag">Kelurahan Pisangan Baru</div>
                     <h1>Aplikasi <span>PPSU</span> Pisangan Baru</h1>
-                    <p class="hero-desc">APPIS MOBILE Sistem manajemen operasional, pelaporan pengaduan Koordinasi untuk warga dan PPSU real-time, jadwal permintaan layanan, dan pemantauan tindak lanjut petugas PPSU Kelurahan Pisangan Baru.</p>
+                    <p class="hero-desc">APPIS MOBILE Sistem manajemen operasional, Layanan PPSU Pisbar memudahkan Koordinasi untuk Pengurus RT/RW dan warga dengan PPSU real-time, jadwal permintaan layanan, dan pemantauan tindak lanjut petugas PPSU Kelurahan Pisangan Baru.</p>
                     
                     <!-- ANIMASI TEXT TICKER -->
                     <div class="info-ticker">
-                        <div class="ticker-item"><i class="fas fa-bolt"></i> Siaga Merespon Layanan Warga 24 Jam</div>
-                        <div class="ticker-item"><i class="fas fa-leaf"></i> Menjaga Lingkungan Pisbar Tetap Asri</div>
+                        <div class="ticker-item"><i class="fas fa-bolt"></i> Siaga Merespon Layanan Warga </div>
+                        <div class="ticker-item"><i class="fas fa-leaf"></i> Menjaga Lingkungan Pisbar Tetap Bersih</div>
                         <div class="ticker-item"><i class="fas fa-bullhorn"></i> Transparansi Tindak Lanjut Terpantau</div>
                     </div>
 
@@ -453,8 +454,8 @@ body {
                 <span class="card-tag">Periodik</span>
                 <div class="card-img" style="background: url('gambar3.jpeg') center/cover, #1e293b;"></div>
                 <div class="card-content">
-                    <h3 class="card-title">Penataan Taman</h3>
-                    <p style="font-size:0.8rem; opacity:0.6;">Penghijauan & Pemangkasan Pohon</p>
+                    <h3 class="card-title">Penataan Kawasan</h3>
+                    <p style="font-size:0.8rem; opacity:0.6;">Penataan Taman</p>
                 </div>
             </div>
             <div class="card-item">
@@ -470,7 +471,7 @@ body {
                 <div class="card-img" style="background: url('gambar5.jpeg') center/cover, #1e293b;"></div>
                 <div class="card-content">
                     <h3 class="card-title">Pilah Sampah Pisbar</h3>
-                    <p style="font-size:0.8rem; opacity:0.6;">Bank Sampah & Edukasi Warga</p>
+                    <p style="font-size:0.8rem; opacity:0.6;">Bank Sampah & Pilah Sampah</p>
                 </div>
             </div>
             <div class="card-item">
@@ -478,7 +479,7 @@ body {
                 <div class="card-img" style="background: url('gambar6.jpeg') center/cover, #1e293b;"></div>
                 <div class="card-content">
                     <h3 class="card-title">Perbaikan Sarpras</h3>
-                    <p style="font-size:0.8rem; opacity:0.6;">Pengecatan & Pemeliharaan Fasum</p>
+                    <p style="font-size:0.8rem; opacity:0.6;"> Pemeliharaan Fasum</p>
                 </div>
             </div>
         </div>
@@ -487,7 +488,7 @@ body {
         <section class="crm-section" id="crm">
             <div class="crm-header">
                 <div>
-                    <h2 style="font-size: 1.5rem; font-weight: 800; color: var(--title);">CRM Pengaduan & Layanan Warga</h2>
+                    <h2 style="font-size: 1.5rem; font-weight: 800; color: var(--title);">CRM Layanan Warga</h2>
                     <p style="font-size: 0.8rem; opacity: 0.6;">Transparansi Penanganan Wilayah oleh Petugas PPSU</p>
                 </div>
                 <button class="btn-3d" onclick="openCreateComplaintModal()" style="background:var(--accent); color:#000; width:auto; padding:10px 20px;">
@@ -551,7 +552,7 @@ body {
                         <div class="icon-box"><img src="letter.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3209/3209265.png'"></div>
                         <span class="app-label">Laporan Harian</span>
                     </a>
-                    <a href="https://appistracking.vercel.app/" class="app-item">
+                    <a href="https://appistracking.vercel.app/" class="app-item" target="_blank">
                         <div class="icon-box"><img src="job.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3652/3652191.png'"></div>
                         <span class="app-label">Jadwal</span>
                     </a>
@@ -563,7 +564,7 @@ body {
                         <div class="icon-box"><img src="folder.png"></div>
                         <span class="app-label">Arsip Digital</span>
                     </a>
-                    <a href="https://script.google.com/macros/s/AKfycbxU60g__l9ssw4DHJmD67nc4-wEJ5Ul7PoRZ2kXxXpn3Pws_8l_C7jpYladKZfvSjE6IA/exec" class="app-item">
+                    <a href="https://script.google.com/macros/s/AKfycbxU60g__l9ssw4DHJmD67nc4-wEJ5Ul7PoRZ2kXxXpn3Pws_8l_C7jpYladKZfvSjE6IA/exec" class="app-item" target="_blank">
                         <div class="icon-box"><img src="e-commeerce.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3299/3299935.png'"></div>
                         <span class="app-label">Pilah Sampah</span>
                     </a>
@@ -571,7 +572,7 @@ body {
                         <div class="icon-box"><img src="siska.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2991/2991112.png'"></div>
                         <span class="app-label">Siska</span>
                     </a>
-                    <a href="https://rekapabsenppsu.netlify.app/" class="app-item">
+                    <a href="https://rekapabsenppsu.netlify.app/" class="app-item" target="_blank">
                         <div class="icon-box"><img src="ai.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/8649/8649595.png'"></div>
                         <span class="app-label">Assistant Rekap</span>
                     </a>
@@ -587,7 +588,7 @@ body {
     <!-- MODAL 1: FORM BUAT PENGADUAN WARGA -->
     <div class="custom-modal" id="modalCreateComplaint">
         <div class="modal-body">
-            <h3 style="margin-bottom:15px; color:var(--title);">Form Pengaduan Warga</h3>
+            <h3 style="margin-bottom:15px; color:var(--title);">Form Permohonan Warga</h3>
             <form id="formCreateComplaint" onsubmit="submitComplaint(event)">
                 <input type="text" id="cmpNama" class="login-input" placeholder="Nama Pelapor Lengkap" required>
                 <input type="tel" id="cmpWa" class="login-input" placeholder="Nomor WhatsApp" required>
@@ -633,7 +634,7 @@ body {
         </div>
     </div>
 
-    <!-- 4. APP VIEWER IFRAME MODAL (Tetap ada jika sewaktu-waktu dibutuhkan) -->
+    <!-- 4. APP VIEWER IFRAME MODAL -->
     <div id="app-viewer">
         <div class="viewer-header">
             <button class="btn-back-home" onclick="closeApp()">
@@ -677,7 +678,112 @@ body {
             }
         }, 30);
 
-        // --- 2. LOGIN & SESSION HANDLING (SECURE BACKEND HASHING) ---
+        // --- 1B. FUNGSI MODE GELAP / TERANG (DITAMBAHKAN) ---
+        const modeToggle = document.getElementById('mode-toggle');
+        if (modeToggle) {
+            modeToggle.addEventListener('click', () => {
+                document.body.classList.toggle('light-mode');
+                const icon = modeToggle.querySelector('i');
+                
+                if (document.body.classList.contains('light-mode')) {
+                    icon.classList.remove('fa-moon');
+                    icon.classList.add('fa-sun');
+                } else {
+                    icon.classList.remove('fa-sun');
+                    icon.classList.add('fa-moon');
+                }
+            });
+        }
+
+        // --- 1C. FUNGSI CINCIN TEKS 3D (DITAMBAHKAN) ---
+        function initRing() {
+            const ring = document.getElementById('ring');
+            if (!ring) return;
+            ring.innerHTML = '';
+            const text = "PPSU PISANGAN BARU • APPIS MOBILE • ";
+            
+            // Atur radius rotasi 3D berdasarkan lebar profil (responsive)
+            const isMobile = window.innerWidth <= 600;
+            const radius = isMobile ? 100 : 135; 
+            
+            const chars = text.split('');
+            const angle = 360 / chars.length;
+            
+            chars.forEach((char, i) => {
+                const span = document.createElement('span');
+                span.innerText = char;
+                span.style.transform = `rotateY(${i * angle}deg) translateZ(${radius}px)`;
+                ring.appendChild(span);
+            });
+        }
+
+        // --- 1D. NAVIGASI SLIDER CAROUSEL & AUTO SCROLL (DITAMBAHKAN) ---
+        const layananSlider = document.getElementById('layanan-slider');
+        const btnPrev = document.getElementById('layanan-prev');
+        const btnNext = document.getElementById('layanan-next');
+        
+        let autoScrollInterval;
+        const scrollAmount = 300; // Jarak scroll
+
+        function startAutoScroll() {
+            autoScrollInterval = setInterval(() => {
+                if (layananSlider) {
+                    // Cek apakah slider sudah mentok sampai paling kanan
+                    if (layananSlider.scrollLeft + layananSlider.clientWidth >= layananSlider.scrollWidth - 10) {
+                        layananSlider.scrollTo({ left: 0, behavior: 'smooth' }); // Ulangi ke awal
+                    } else {
+                        layananSlider.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+                    }
+                }
+            }, 3000); // Waktu jeda auto-scroll: 3 detik
+        }
+
+        function stopAutoScroll() {
+            clearInterval(autoScrollInterval);
+        }
+
+        if (layananSlider) {
+            startAutoScroll(); // Mulai otomatisasi saat halaman siap
+            
+            // Jeda scroll otomatis jika kursor sedang berada di atas area carousel
+            layananSlider.addEventListener('mouseenter', stopAutoScroll);
+            layananSlider.addEventListener('mouseleave', startAutoScroll);
+            layananSlider.addEventListener('touchstart', stopAutoScroll, {passive: true});
+            layananSlider.addEventListener('touchend', startAutoScroll, {passive: true});
+        }
+
+        if (btnPrev && layananSlider) {
+            btnPrev.addEventListener('click', () => {
+                layananSlider.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+                // Reset timer jika user menekan tombol manual agar tidak tumpang tindih
+                stopAutoScroll();
+                startAutoScroll();
+            });
+        }
+        if (btnNext && layananSlider) {
+            btnNext.addEventListener('click', () => {
+                layananSlider.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+                // Reset timer jika user menekan tombol manual agar tidak tumpang tindih
+                stopAutoScroll();
+                startAutoScroll();
+            });
+        }
+
+        // --- 1E. FUNGSI TOMBOL "LIHAT SEMUA" PADA APPS GRID (DITAMBAHKAN) ---
+        const btnSeeAll = document.getElementById('btn-see-all');
+        const appsGrid = document.getElementById('apps-grid');
+        if(btnSeeAll && appsGrid) {
+            btnSeeAll.addEventListener('click', () => {
+                appsGrid.classList.toggle('expanded');
+                if (appsGrid.classList.contains('expanded')) {
+                    btnSeeAll.innerText = 'Lebih Sedikit';
+                } else {
+                    btnSeeAll.innerText = 'Lihat Semua';
+                }
+            });
+        }
+
+        // --- 2. LOGIN & SESSION HANDLING ---
         async function handleAdminLogin(e) {
             e.preventDefault();
             const btn = document.getElementById('btnLoginSubmit');
@@ -735,7 +841,7 @@ body {
                 if(user.role) document.getElementById('userDisplayRole').innerText = user.role;
             }
 
-            // Fungsi inisialisasi cincin 3D, memanggil jika ada (diasumsikan ada di kode yang terpotong sebelumnya, atau tidak dipanggil jika tidak ada fungsi initRing())
+            // Inisialisasi cincin 3D Profil
             if(typeof initRing === "function") initRing();
             
             fetchComplaints();
@@ -974,82 +1080,53 @@ body {
             btn.disabled = true;
 
             try {
-                const targetId = document.getElementById('rspId').value;
+                const id = document.getElementById('rspId').value;
                 const status = document.getElementById('rspStatus').value;
                 const tanggapan = document.getElementById('rspTanggapan').value;
                 const fotoFile = document.getElementById('rspFoto').files[0];
                 const base64Foto = await fileToBase64(fotoFile);
 
-                const payload = { 
-                    action: "respondComplaint", 
-                    id: targetId, 
-                    status: status, 
-                    tanggapan: tanggapan, 
-                    fotoTindakLanjutBase64: base64Foto 
-                };
-
-                const item = localComplaints.find(c => c.id === targetId);
-                if (item) {
-                    item.status = status;
-                    item.tanggapan = tanggapan;
-                    if(base64Foto) item.fotoTindakLanjut = base64Foto;
+                // Update data keluhan di penyimpanan lokal untuk rendering sementara
+                const index = localComplaints.findIndex(c => c.id === id);
+                if (index !== -1) {
+                    localComplaints[index].status = status;
+                    localComplaints[index].tanggapan = tanggapan;
+                    if (base64Foto) localComplaints[index].fotoTindakLanjut = base64Foto;
                 }
 
                 renderComplaints();
                 closeModal('modalRespondComplaint');
                 document.getElementById('formRespondComplaint').reset();
-                
+
+                // Kirim respon pembaruan ke server Google Apps Script
                 await fetch(GAS_API_URL, {
                     method: "POST",
                     headers: { "Content-Type": "text/plain" },
-                    body: JSON.stringify(payload)
+                    body: JSON.stringify({
+                        action: "respondComplaint",
+                        id: id,
+                        status: status,
+                        tanggapan: tanggapan,
+                        fotoTindakLanjutBase64: base64Foto,
+                        userEmail: "admin@pisanganbaru.id"
+                    })
                 });
-            } catch(err) {
-                console.warn("Tanggapan diperbarui lokal:", err);
+            } catch (err) {
+                console.warn("Disimpan secara lokal:", err);
             } finally {
                 btn.innerText = "SIMPAN TANGGAPAN";
                 btn.disabled = false;
             }
         }
 
-        // --- 5. APP VIEWER (Tetap dipertahankan fungsi dasarnya tanpa memaksa override link moduls) ---
-        function openApp(url) {
-            const v = document.getElementById('app-viewer');
-            const f = document.getElementById('app-iframe');
-            const b = document.getElementById('mobile-nav');
-            
-            f.src = url;
-            v.style.display = 'flex';
-            document.body.style.overflow = 'hidden';
-            if(b) b.classList.add('nav-hidden');
-
-            history.pushState({ inAppViewer: true }, "", "#sub-app");
-        }
+        // --- 5. FUNGSI MENUTUP APP VIEWER ---
         function closeApp() {
-            const v = document.getElementById('app-viewer');
-            const b = document.getElementById('mobile-nav');
-            if (v && v.style.display === 'flex') {
-                v.style.display = 'none';
-                document.getElementById('app-iframe').src = '';
-                document.body.style.overflow = 'auto';
-                if(b) b.classList.remove('nav-hidden');
-                if (history.state && history.state.inAppViewer) { history.back(); }
-            }
+            const appViewer = document.getElementById('app-viewer');
+            const iframe = document.getElementById('app-iframe');
+            if (appViewer) appViewer.style.display = 'none';
+            if (iframe) iframe.src = '';
         }
-        window.addEventListener('popstate', function(event) {
-            const v = document.getElementById('app-viewer');
-            if (v && v.style.display === 'flex') {
-                v.style.display = 'none';
-                document.getElementById('app-iframe').src = '';
-                document.body.style.overflow = 'auto';
-                const b = document.getElementById('mobile-nav');
-                if(b) b.classList.remove('nav-hidden');
-            }
-        });
-        
-        // PENGATURAN KLIK PADA MODUL (.app-item)
-        // Telah dihapus bagian interceptor 'onclick' (document.querySelectorAll('.app-item').forEach...). 
-        // Kini secara otomatis seluruh link akan mengarah "direct" (menggunakan perilaku standar tag HTML <a> href)
+
     </script>
 </body>
 </html>
