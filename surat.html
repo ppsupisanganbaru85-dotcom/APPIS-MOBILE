@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generator Surat | Appis Mobile </title>
+    <!-- Tesseract untuk AI OCR -->
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
+    <!-- SheetJS untuk membaca file Excel -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <!-- html2pdf untuk fitur Unduh PDF langsung -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
+    <style>
+        :root {
+            /* Tema Oranye Dominan */
+            --primary: #f97316;       
+            --primary-hover: #ea580c; 
+            --primary-dark: #c2410c;  
+            
+            --bg-color: #fff7ed;      
+            --surface: #ffffff;
+            --border: #fdba74;        
+            --text: #1e293b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', system-ui, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden; 
+        }
+
+        /* ========= MODAL LOGIN SCREEN (NEW) ========= */
+        .login-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, #fff7ed 0%, #ffedd5 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            padding: 20px;
+        }
+        .login-card {
+            background: #ffffff;
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            padding: 35px 28px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 20px 40px rgba(234, 88, 12, 0.15);
+            text-align: center;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .login-logo {
+            width: 75px;
+            height: auto;
+            margin-bottom: 12px;
+        }
+        .login-title {
+            font-size: 1.35rem;
+            font-weight: bold;
+            color: var(--primary-dark);
+            margin-bottom: 4px;
+        }
+        .login-subtitle {
+            font-size: 0.85rem;
+            color: #64748b;
+            margin-bottom: 22px;
+        }
+        .login-error {
+            display: none;
+            background-color: #fef2f2;
+            border: 1px solid #fca5a5;
+            color: #dc2626;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            margin-bottom: 16px;
+            font-weight: 600;
+        }
+        .pwd-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .pwd-wrapper .form-control {
+            padding-right: 45px;
+        }
+        .pwd-toggle-btn {
+            position: absolute;
+            right: 12px;
+            background: none;
+            border: none;
+            font-size: 1.1rem;
+            cursor: pointer;
+            color: #64748b;
+            user-select: none;
+        }
+
+        .tab-nav {
+            display: flex;
+            background: var(--surface);
+            border-bottom: 2px solid var(--border);
+            z-index: 20;
+            box-shadow: 0 4px 15px rgba(234, 88, 12, 0.1);
+            overflow-x: auto; 
+            white-space: nowrap;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 15px 10px;
+            border: none;
+            background: none;
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #94a3b8;
+            cursor: pointer;
+            border-bottom: 4px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn:hover, .tab-btn.active {
+            color: var(--primary-dark);
+            border-bottom-color: var(--primary);
+            background-color: #ffedd5;
+        }
+
+        .btn-logout {
+            color: #ef4444 !important;
+            margin-left: auto;
+            flex: 0 0 auto;
+        }
+        .btn-logout:hover {
+            background-color: #fef2f2 !important;
+            color: #dc2626 !important;
+        }
+
+        .tab-content {
+            display: none; 
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .tab-content.active { display: block; }
+
+        .panel-preview {
+            justify-content: center;
+            align-items: flex-start;
+            background: #cbd5e1;
+            padding: 40px 20px;
+        }
+        .panel-preview.active { display: flex; }
+
+        .panel-input {
+            padding: 30px;
+            max-width: 850px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .panel-header {
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px dashed var(--border);
+            text-align: center;
+        }
+        
+        .panel-header h2 { color: var(--primary-dark); }
+
+        .form-group { margin-bottom: 18px; }
+        .form-group label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+            color: #475569;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #fed7aa;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            background-color: #fffaf5;
+        }
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            background-color: #ffffff;
+            box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.15);
+        }
+        textarea.form-control { resize: vertical; min-height: 90px; }
+
+        .btn-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .btn {
+            padding: 14px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.1s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-3d {
+            background-color: var(--primary);
+            color: white;
+            box-shadow: 0 6px 0 var(--primary-dark), 0 10px 10px rgba(0,0,0,0.15);
+            margin-bottom: 6px;
+        }
+        
+        .btn-3d:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(2px);
+            box-shadow: 0 4px 0 var(--primary-dark), 0 6px 8px rgba(0,0,0,0.15);
+        }
+
+        .btn-3d:active {
+            transform: translateY(6px);
+            box-shadow: 0 0 0 var(--primary-dark), 0 2px 3px rgba(0,0,0,0.15);
+        }
+
+        .btn-download {
+            background-color: #10b981;
+            box-shadow: 0 6px 0 #047857, 0 10px 10px rgba(0,0,0,0.15);
+        }
+        .btn-download:hover {
+            background-color: #059669;
+            box-shadow: 0 4px 0 #047857, 0 6px 8px rgba(0,0,0,0.15);
+        }
+
+        .btn-3d-secondary {
+            background-color: #f1f5f9;
+            color: #334155;
+            box-shadow: 0 6px 0 #cbd5e1, 0 10px 10px rgba(0,0,0,0.1);
+            margin-bottom: 6px;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.8rem;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+        .btn-sm:hover { background-color: var(--primary-hover); }
+
+        .ocr-section {
+            background: #fff7ed;
+            border: 2px dashed var(--primary);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+        .ocr-status { font-size: 0.9rem; margin-top: 12px; color: #ea580c; font-weight: 700; }
+
+        /* ========= AREA SURAT A4 ========= */
+        .a4-paper {
+            background: white;
+            width: 210mm;
+            min-height: 297mm;
+            padding: 15mm 2cm 20mm 2cm;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            font-family: Arial, Helvetica, sans-serif;
+            color: black;
+            position: relative;
+            transform-origin: top center;
+        }
+
+        @media (max-width: 768px) {
+            .a4-paper { transform: scale(0.55); margin-bottom: -120mm; }
+        }
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .a4-paper { transform: scale(0.8); margin-bottom: -50mm; }
+        }
+
+        .surat-text { font-size: 11pt; line-height: 1.4; }
+        
+        .kop-surat {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-bottom: 2px solid #000;
+            padding-bottom: 4px;
+            margin-bottom: 18px;
+            min-height: 90px;
+        }
+        
+        .kop-logo { position: absolute; left: 0; top: 0; width: 85px; height: auto; }
+        
+        .kop-teks { width: 100%; text-align: center; line-height: 1; margin-top: -1px; margin-left: 50px; }
+        .kop-teks h1 { font-size: 13pt; font-weight: normal; margin: 0; }
+        .kop-teks h2 { font-size: 13.5pt; font-weight: bold; margin: 1px 0; }
+        .kop-teks p { font-size: 10pt; margin: 0; }
+        
+        .spacing-jkt { font-size: 10.5pt; margin-top: 2px; margin-bottom: 10px; letter-spacing: 2px; }
+        .kode-pos-absolute { position: absolute; right: 0; bottom: 0; font-size: 10pt; }
+
+        .meta-surat { display: flex; justify-content: space-between; margin-bottom: 18px; font-size: 11pt; }
+        .meta-kiri { width: 48%; }
+        .meta-kiri table { border-collapse: collapse; width: 100%; }
+        .meta-kiri td { vertical-align: top; padding: 1px 0; }
+        .meta-kiri td:nth-child(1) { width: 75px; } 
+        .meta-kiri td:nth-child(2) { width: 15px; text-align: center; } 
+
+        .meta-kanan { width: 52%; padding-left: 10px; }
+        .tgl-surat { margin-bottom: 2px; margin-left: 39px; }
+        .kepada-title { margin-left: 59px; margin-bottom: 2px; }
+        .yth-block { display: flex; align-items: flex-start; }
+        .yth-label { width: 42px; flex-shrink: 0; }
+        .kepada-list-container { flex: 1; }
+        .kepada-list-ol { margin: 0; padding-left: 18px; font-size: 11pt; }
+        .kepada-list-ol li { margin-bottom: 2px; line-height: 1.35; }
+
+        .di-jakarta { margin-top: 2px; margin-left: 1px; line-height: 1.35; }
+        .di-jakarta .jkt-indent { margin-left: 22px; }
+
+        .isi-surat { text-align: justify; margin-bottom: 8px; line-height: 1.45; margin-left: 83px; }
+        .isi-permohonan { white-space: pre-wrap; }
+
+        .detail-acara {
+            display: grid; grid-template-columns: 70px 15px 1fr;
+            margin-left: 120px; margin-top: 6px; margin-bottom: 10px;
+            font-size: 11pt; line-height: 1.45;
+        }
+        .detail-acara .colon { text-align: center; }
+
+        .signature-area { display: flex; justify-content: flex-end; margin-top: 25px; }
+        .signature-box { text-align: center; width: 290px; }
+        .signature-space { height: 75px; position: relative; } 
+        .nama-pejabat { font-weight: bold; margin-bottom: 2px; }
+        .tembusan { margin-top: 25px; font-size: 10.5pt; }
+
+        /* ========= MODAL PENCARIAN KODE SURAT ========= */
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.6); z-index: 1000;
+            align-items: center; justify-content: center; backdrop-filter: blur(3px);
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-content {
+            background: white; width: 90%; max-width: 500px; border-radius: 12px;
+            padding: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            position: relative; max-height: 85vh; display: flex; flex-direction: column;
+        }
+        .modal-close {
+            position: absolute; right: 20px; top: 20px; font-size: 1.5rem; 
+            color: #94a3b8; cursor: pointer; line-height: 1;
+        }
+        .modal-close:hover { color: var(--primary-dark); }
+        .modal-title { 
+            font-size: 1.25rem; color: var(--primary-dark); margin-bottom: 10px; 
+            border-bottom: 2px dashed var(--border); padding-bottom: 10px; font-weight: bold;
+        }
+        .search-results {
+            margin-top: 15px; overflow-y: auto; flex: 1;
+            border: 1px solid #e2e8f0; border-radius: 8px; background: #f8fafc;
+        }
+        .result-item {
+            padding: 12px 15px; border-bottom: 1px solid #e2e8f0; cursor: pointer; transition: background 0.2s;
+        }
+        .result-item:hover { background: #ffedd5; }
+        .result-item:last-child { border-bottom: none; }
+        .result-kode { font-weight: bold; color: var(--primary-dark); font-size: 0.95rem; }
+        .result-desc { font-size: 0.85rem; color: #475569; margin-top: 4px; }
+
+        @media print {
+            @page { size: A4; margin: 0; }
+            body, html { height: auto; background: white; overflow: visible; }
+            .tab-nav, .panel-input, .login-overlay { display: none !important; }
+            
+            .panel-preview.active { 
+                display: block !important; padding: 0; background: none; overflow: visible; 
+            }
+            .a4-paper {
+                box-shadow: none; transform: none !important; margin: 0; width: 210mm;
+                height: 297mm; page-break-after: always;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- OVERLAY LOGIN (NEW) -->
+    <div id="loginOverlay" class="login-overlay">
+        <div class="login-card">
+            <img src="logoappis.png" class="login-logo" alt="Logo DKI">
+            <h2 class="login-title">Appis Mobile</h2>
+            <p class="login-subtitle">Akses Generator Surat Kelurahan Pisangan Baru</p>
+
+            <div id="loginError" class="login-error"></div>
+
+            <form onsubmit="loginSystem(event)">
+                <div class="form-group" style="text-align: left;">
+                    <label for="loginEmail">Email / Username</label>
+                    <input type="email" id="loginEmail" class="form-control" placeholder="Masukkan Nama User" required autocomplete="username">
+                </div>
+
+                <div class="form-group" style="text-align: left;">
+                    <label for="loginPassword">Password</label>
+                    <div class="pwd-wrapper">
+                        <input type="password" id="loginPassword" class="form-control" placeholder="Masukkan Password" required autocomplete="current-password">
+                        <button type="button" class="pwd-toggle-btn" onclick="togglePasswordVisibility()" title="Tampilkan/Sembunyikan Password">
+                            <span id="pwdIcon">👁️</span>
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-3d" style="width: 100%; margin-top: 10px; padding: 14px;">
+                    🔑 Masuk Sistem
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- NAVIGASI TAB -->
+    <nav class="tab-nav">
+        <button class="tab-btn active" id="btn-in-undangan" onclick="switchTab('in-undangan')">📝 1. Input Undangan</button>
+        <button class="tab-btn" id="btn-out-undangan" onclick="switchTab('out-undangan')">📄 2. Hasil Undangan</button>
+        <button class="tab-btn" id="btn-in-permohonan" onclick="switchTab('in-permohonan')">📝 3. Input Permohonan</button>
+        <button class="tab-btn" id="btn-out-permohonan" onclick="switchTab('out-permohonan')">📄 4. Hasil Permohonan</button>
+        <button class="tab-btn btn-logout" onclick="logoutSystem()" title="Keluar dari Aplikasi">🔒 Keluar</button>
+    </nav>
+
+    <!-- PANEL 1: INPUT SURAT UNDANGAN -->
+    <div id="panel-in-undangan" class="tab-content panel-input active">
+        <div class="panel-header">
+            <h2>Buat Surat Undangan</h2>
+            <p style="font-size:0.9rem; color:#64748b; margin-top:5px;">Lengkapi form berikut untuk surat undangan dan Aktifkan Mode Desktop untuk melihat hasil surat</p>
+        </div>
+
+        <div class="btn-group">
+            <button class="btn btn-3d" onclick="window.print()">🖨️ Cetak Print</button>
+            <button class="btn btn-3d btn-download" onclick="unduhPDF('undangan')">📥 Unduh PDF</button>
+            <button class="btn btn-3d-secondary" onclick="resetForm()">🔄 Reset Data</button>
+        </div>
+
+        <div class="ocr-section">
+            <p style="font-size:0.95rem; margin-bottom:15px; font-weight:700;">Scan Surat Fisik</p>
+            <input type="file" id="cameraInputU" accept="image/*" capture="environment" style="display: none;" onchange="prosesOCR(event, 'u')">
+            <button class="btn btn-3d" style="width:100%;" onclick="document.getElementById('cameraInputU').click()">
+                📸 Buka Kamera / Pilih Gambar
+            </button>
+            <div id="ocrStatus-u" class="ocr-status"></div>
+        </div>
+
+        <div class="form-group">
+            <label style="display:flex; justify-content:space-between; align-items:center;">
+                Nomor Surat
+                <button type="button" class="btn-sm" onclick="bukaModalCari('u')">🔍 Cari Kode</button>
+            </label>
+            <input type="text" class="form-control" id="in-u-nomor" value="525/PU.04.00" oninput="updateView('nomor', 'u')">
+        </div>
+        
+        <div class="form-group"><label>Sifat</label><input type="text" class="form-control" id="in-u-sifat" value="Biasa" oninput="updateView('sifat', 'u')"></div>
+        <div class="form-group"><label>Hal</label><textarea class="form-control" id="in-u-hal" oninput="updateView('hal', 'u')">Undangan Aksi Kebersihan Grebek Lumpur</textarea></div>
+        <div class="form-group"><label>Tanggal Surat</label><input type="text" class="form-control" id="in-u-tanggal-surat" value="03 September 2026" oninput="updateView('tanggal-surat', 'u')"></div>
+        <div class="form-group"><label>Kepada Yth. (Enter untuk baris baru)</label><textarea class="form-control" id="in-u-kepada" style="height:140px" oninput="updateList('kepada', 'u')">Ketua RW.014
+Ketua RT.03,04,05 dan 08 RW.014
+LMK RW.014</textarea></div>
+        <div class="form-group"><label>Paragraf Pembuka</label><textarea class="form-control" id="in-u-pembuka" oninput="updateView('pembuka', 'u')">Menindaklanjuti Surat Tugas Camat Kecamatan Matraman Nomor 370/PU.04.00 tentang Daftar Petugas Pelaksanaan Aksi Kebersihan Grebek Lumpur. Dengan ini,kami mohon kehadiran Bapak / Ibu pada</textarea></div>
+        
+        <h3 style="margin: 30px 0 15px; font-size: 1.15rem; border-bottom: 2px dashed #fdba74; padding-bottom:8px; color: var(--primary-dark);">Detail Acara</h3>
+        <div class="form-group"><label>Hari</label><input type="text" class="form-control" id="in-u-hari" value="Jum'at" oninput="updateView('hari', 'u')"></div>
+        <div class="form-group"><label>Tanggal Acara</label><input type="text" class="form-control" id="in-u-tanggal-acara" value="11 September 2026" oninput="updateView('tanggal-acara', 'u')"></div>
+        <div class="form-group"><label>Waktu</label><input type="text" class="form-control" id="in-u-waktu" value="07.30 s.d selesai" oninput="updateView('waktu', 'u')"></div>
+        <div class="form-group"><label>Tempat</label><textarea class="form-control" id="in-u-tempat" oninput="updateView('tempat', 'u')">Jl Pisangan Baru Tengah RT.03,04 ,05 dan 08 RW 014 (Titik Apel Tanah Kosong)</textarea></div>
+        <div class="form-group"><label>Acara</label><input type="text" class="form-control" id="in-u-acara" value="Pelaksanaan Aksi Kebersihan Grebek Lumpur" oninput="updateView('acara', 'u')"></div>
+
+        <h3 style="margin: 30px 0 15px; font-size: 1.15rem; border-bottom: 2px dashed #fdba74; padding-bottom:8px; color: var(--primary-dark);">Penandatangan</h3>
+        <div class="form-group"><label>Jabatan</label><textarea class="form-control" id="in-u-jabatan" oninput="updateView('jabatan', 'u')">Lurah Kelurahan Pisangan Baru</textarea></div>
+        <div class="form-group"><label>Nama Pejabat</label><input type="text" class="form-control" id="in-u-nama-pejabat" value="Nama Pejabat" oninput="updateView('nama-pejabat', 'u')"></div>
+        <div class="form-group"><label>NIP</label><input type="text" class="form-control" id="in-u-nip" value="1981112210012220" oninput="updateView('nip', 'u')"></div>
+        
+        <div style="display: flex; gap: 10px; margin-top: 20px;">
+            <button class="btn btn-3d" style="flex:1; padding: 18px;" onclick="window.print()">🖨️ Print Surat</button>
+            <button class="btn btn-3d btn-download" style="flex:1; padding: 18px;" onclick="unduhPDF('undangan')">📥 Simpan PDF</button>
+        </div>
+        <div style="height: 60px;"></div>
+    </div>
+
+    <!-- PANEL 2: HASIL SURAT UNDANGAN -->
+    <div id="panel-out-undangan" class="tab-content panel-preview">
+        <div id="kertas-undangan" class="a4-paper surat-text">
+            <div class="kop-surat">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Coat_of_arms_of_Jakarta.svg/438px-Coat_of_arms_of_Jakarta.svg.png" crossorigin="anonymous" class="kop-logo" onerror="this.src='logodki.png'">
+                <div class="kop-teks">
+                    <h1>PEMERINTAH PROVINSI DAERAH KHUSUS IBUKOTA JAKARTA</h1>
+                    <h1>KOTA ADMINISTRASI JAKARTA TIMUR</h1>
+                    <h1>KECAMATAN MATRAMAN</h1>
+                    <h2>KELURAHAN PISANGAN BARU</h2>
+                    <p>Jl. Pisangan Baru Utara – Telepon 021- 8505372 - Faksimile 021-8516161</p>
+                    <p>E-mail : pisbar.matraman@gmail.com</p>
+                    <div class="spacing-jkt">J A K A R T A</div>
+                    <div class="kode-pos-absolute">Kode Pos : 13110</div>
+                </div>
+            </div>
+
+            <div class="meta-surat">
+                <div class="meta-kiri">
+                    <table>
+                        <tr><td>Nomor</td><td>:</td><td id="out-u-nomor">525/PU.04.00</td></tr>
+                        <tr><td>Sifat</td><td>:</td><td id="out-u-sifat">Biasa</td></tr>
+                        <tr><td>Lampiran</td><td>:</td><td>-</td></tr>
+                        <tr><td>Hal</td><td>:</td><td id="out-u-hal" style="white-space: pre-wrap;">Undangan Aksi Kebersihan Grebek Lumpur</td></tr>
+                    </table>
+                </div>
+                <div class="meta-kanan">
+                    <div class="tgl-surat" id="out-u-tanggal-surat">03 September 2026</div>
+                    <div class="kepada-title">Kepada</div>
+                    <div class="yth-block">
+                        <div class="yth-label">Yth.</div>
+                        <div class="kepada-list-container">
+                            <ol id="out-u-kepada" class="kepada-list-ol"></ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="isi-surat" id="out-u-pembuka" style="text-indent: 40px;"></div>
+
+            <div class="detail-acara">
+                <div>hari</div><div class="colon">:</div><div id="out-u-hari">Jum'at</div>
+                <div>tanggal</div><div class="colon">:</div><div id="out-u-tanggal-acara">11 September 2026</div>
+                <div>waktu</div><div class="colon">:</div><div id="out-u-waktu">07.30 s.d selesai</div>
+                <div>tempat</div><div class="colon">:</div><div id="out-u-tempat"></div>
+                <div>acara</div><div class="colon">:</div><div id="out-u-acara"></div>
+            </div>
+
+            <div class="isi-surat" style="text-indent: 40px;">
+                Demikian undangan ini disampaikan, atas perhatian dan kerja samanya diucapkan terima kasih.
+            </div>
+
+            <div class="signature-area">
+                <div class="signature-box">
+                    <div id="out-u-jabatan" style="white-space: pre-wrap;">Lurah Kelurahan Pisangan Baru</div>
+                    <div class="signature-space"></div>
+                    <div id="out-u-nama-pejabat" class="nama-pejabat">Nama Pejabat Penandatanganan</div>
+                    <div>NIP <span id="out-u-nip">1983111010011020</span></div>
+                </div>
+            </div>
+            
+            <div class="tembusan">Tembusan :<br>Camat Kecamatan Matraman</div>
+        </div>
+    </div>
+
+
+    <!-- PANEL 3: INPUT SURAT PERMOHONAN -->
+    <div id="panel-in-permohonan" class="tab-content panel-input">
+        <div class="panel-header">
+            <h2>Buat Surat Permohonan / Umum</h2>
+            <p style="font-size:0.9rem; color:#64748b; margin-top:5px;">Lengkapi isi data untuk surat umum dan Aktifkan Mode Desktop untuk melihat hasil surat</p>
+        </div>
+
+        <div class="btn-group">
+            <button class="btn btn-3d" onclick="window.print()">🖨️ Cetak Print</button>
+            <button class="btn btn-3d btn-download" onclick="unduhPDF('permohonan')">📥 Unduh PDF</button>
+            <button class="btn btn-3d-secondary" onclick="resetForm()">🔄 Reset Data</button>
+        </div>
+
+        <div class="ocr-section">
+            <p style="font-size:0.95rem; margin-bottom:15px; font-weight:700;">Scan Surat Fisik</p>
+            <input type="file" id="cameraInputP" accept="image/*" capture="environment" style="display: none;" onchange="prosesOCR(event, 'p')">
+            <button class="btn btn-3d" style="width:100%;" onclick="document.getElementById('cameraInputP').click()">
+                📸 Buka Kamera / Pilih Gambar
+            </button>
+            <div id="ocrStatus-p" class="ocr-status"></div>
+        </div>
+
+        <div class="form-group">
+            <label style="display:flex; justify-content:space-between; align-items:center;">
+                Nomor Surat
+                <button type="button" class="btn-sm" onclick="bukaModalCari('p')">🔍 Cari Kode</button>
+            </label>
+            <input type="text" class="form-control" id="in-p-nomor" value="123/PU.00.00" oninput="updateView('nomor', 'p')">
+        </div>
+        
+        <div class="form-group"><label>Sifat</label><input type="text" class="form-control" id="in-p-sifat" value="Penting" oninput="updateView('sifat', 'p')"></div>
+        <div class="form-group"><label>Hal</label><textarea class="form-control" id="in-p-hal" oninput="updateView('hal', 'p')">Permohonan Bantuan Logistik</textarea></div>
+        <div class="form-group"><label>Tanggal Surat</label><input type="text" class="form-control" id="in-p-tanggal-surat" value="15 September 2026" oninput="updateView('tanggal-surat', 'p')"></div>
+        <div class="form-group"><label>Kepada Yth. (Enter untuk baris baru)</label><textarea class="form-control" id="in-p-kepada" style="height:100px" oninput="updateList('kepada', 'p')">Kepala Suku Dinas Sosial
+Kota Administrasi Jakarta Timur</textarea></div>
+        
+        <div class="form-group">
+            <label>Isi / Deskripsi Surat Permohonan (Tekan Enter untuk paragraf baru)</label>
+            <textarea class="form-control" id="in-p-isi" style="height:250px" oninput="updateView('isi', 'p')">Sehubungan dengan terjadinya musibah genangan air di wilayah RW 014 Kelurahan Pisangan Baru pada tanggal 14 September 2026, bersama ini kami sampaikan permohonan bantuan logistik untuk warga terdampak.
+
+Adapun kebutuhan mendesak yang diperlukan saat ini meliputi makanan siap saji, air bersih, dan perlengkapan bayi.
+
+Demikian surat permohonan ini kami sampaikan, atas perhatian dan bantuan Bapak/Ibu kami ucapkan terima kasih.</textarea>
+        </div>
+
+        <h3 style="margin: 30px 0 15px; font-size: 1.15rem; border-bottom: 2px dashed #fdba74; padding-bottom:8px; color: var(--primary-dark);">Penandatangan</h3>
+        <div class="form-group"><label>Jabatan</label><textarea class="form-control" id="in-p-jabatan" oninput="updateView('jabatan', 'p')">Lurah Kelurahan Pisangan Baru</textarea></div>
+        <div class="form-group"><label>Nama Pejabat</label><input type="text" class="form-control" id="in-p-nama-pejabat" value="Nama Pejabat" oninput="updateView('nama-pejabat', 'p')"></div>
+        <div class="form-group"><label>NIP</label><input type="text" class="form-control" id="in-p-nip" value="1981112210012220" oninput="updateView('nip', 'p')"></div>
+        
+        <div style="display: flex; gap: 10px; margin-top: 20px;">
+            <button class="btn btn-3d" style="flex:1; padding: 18px;" onclick="window.print()">🖨️ Print Surat</button>
+            <button class="btn btn-3d btn-download" style="flex:1; padding: 18px;" onclick="unduhPDF('permohonan')">📥 Simpan PDF</button>
+        </div>
+        <div style="height: 60px;"></div>
+    </div>
+
+
+    <!-- PANEL 4: HASIL SURAT PERMOHONAN -->
+    <div id="panel-out-permohonan" class="tab-content panel-preview">
+        <div id="kertas-permohonan" class="a4-paper surat-text">
+            <div class="kop-surat">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Coat_of_arms_of_Jakarta.svg/438px-Coat_of_arms_of_Jakarta.svg.png" crossorigin="anonymous" class="kop-logo" onerror="this.src='logodki.png'">
+                <div class="kop-teks">
+                    <h1>PEMERINTAH PROVINSI DAERAH KHUSUS IBUKOTA JAKARTA</h1>
+                    <h1>KOTA ADMINISTRASI JAKARTA TIMUR</h1>
+                    <h1>KECAMATAN MATRAMAN</h1>
+                    <h2>KELURAHAN PISANGAN BARU</h2>
+                    <p>Jl. Pisangan Baru Utara – Telepon 021- 8505372 - Faksimile 021-8516161</p>
+                    <p>E-mail : pisbar.matraman@gmail.com</p>
+                    <div class="spacing-jkt">J A K A R T A</div>
+                    <div class="kode-pos-absolute">Kode Pos : 13110</div>
+                </div>
+            </div>
+
+            <div class="meta-surat">
+                <div class="meta-kiri">
+                    <table>
+                        <tr><td>Nomor</td><td>:</td><td id="out-p-nomor"></td></tr>
+                        <tr><td>Sifat</td><td>:</td><td id="out-p-sifat"></td></tr>
+                        <tr><td>Lampiran</td><td>:</td><td>-</td></tr>
+                        <tr><td>Hal</td><td>:</td><td id="out-p-hal" style="white-space: pre-wrap;"></td></tr>
+                    </table>
+                </div>
+                <div class="meta-kanan">
+                    <div class="tgl-surat" id="out-p-tanggal-surat"></div>
+                    <div class="kepada-title">Kepada</div>
+                    <div class="yth-block">
+                        <div class="yth-label">Yth.</div>
+                        <div class="kepada-list-container">
+                            <ol id="out-p-kepada" class="kepada-list-ol"></ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="isi-surat isi-permohonan" id="out-p-isi"></div>
+
+            <div class="signature-area">
+                <div class="signature-box">
+                    <div id="out-p-jabatan" style="white-space: pre-wrap;"></div>
+                    <div class="signature-space"></div>
+                    <div id="out-p-nama-pejabat" class="nama-pejabat"></div>
+                    <div>NIP <span id="out-p-nip"></span></div>
+                </div>
+            </div>
+            
+            <div class="tembusan">Tembusan :<br>Camat Kecamatan Matraman</div>
+        </div>
+    </div>
+
+    <!-- MODAL PENCARIAN KODE SURAT -->
+    <div id="searchModal" class="modal-overlay" onclick="if(event.target === this) tutupModalCari();">
+        <div class="modal-content">
+            <span class="modal-close" onclick="tutupModalCari()">&times;</span>
+            <div class="modal-title">🔍 Pencarian Kode Surat</div>
+            <p style="font-size:0.9rem; color:#475569; margin-bottom:15px;">Ketik kata kunci untuk mencari dan memilih kode surat secara otomatis.</p>
+            
+            <input type="text" id="cariKodeInput" class="form-control" placeholder="Tuliskan kode atau judul naskah..." style="margin-bottom: 10px;" oninput="filterPencarian()">
+            
+            <div id="searchResults" class="search-results"></div>
+        </div>
+    </div>
+
+    <script>
+        // ==============================================
+        // FUNGSI SISTEM LOGIN & AUTENTIKASI (NEW)
+        // ==============================================
+        function checkAuthOnLoad() {
+            const isLoggedIn = sessionStorage.getItem('appis_logged_in');
+            const overlay = document.getElementById('loginOverlay');
+            if (isLoggedIn === 'true') {
+                overlay.style.display = 'none';
+            } else {
+                overlay.style.display = 'flex';
+            }
+        }
+
+        function loginSystem(e) {
+            if (e) e.preventDefault();
+            const emailInput = document.getElementById('loginEmail').value.trim();
+            const passwordInput = document.getElementById('loginPassword').value.trim();
+            const errorBox = document.getElementById('loginError');
+
+            if (emailInput === 'admin@ppsupisbar.id' && passwordInput === 'Pi3sBar') {
+                sessionStorage.setItem('appis_logged_in', 'true');
+                document.getElementById('loginOverlay').style.display = 'none';
+                errorBox.style.display = 'none';
+                document.getElementById('loginPassword').value = '';
+            } else {
+                errorBox.innerText = 'Email atau Password yang Anda masukkan salah!';
+                errorBox.style.display = 'block';
+            }
+        }
+
+        function togglePasswordVisibility() {
+            const pwdInput = document.getElementById('loginPassword');
+            const pwdIcon = document.getElementById('pwdIcon');
+            if (pwdInput.type === 'password') {
+                pwdInput.type = 'text';
+                pwdIcon.innerText = '🙈';
+            } else {
+                pwdInput.type = 'password';
+                pwdIcon.innerText = '👁️';
+            }
+        }
+
+        function logoutSystem() {
+            if (confirm('Apakah Anda yakin ingin keluar dari sistem?')) {
+                sessionStorage.removeItem('appis_logged_in');
+                document.getElementById('loginOverlay').style.display = 'flex';
+                document.getElementById('loginEmail').value = '';
+                document.getElementById('loginPassword').value = '';
+                document.getElementById('loginError').style.display = 'none';
+            }
+        }
+
+        // ==============================================
+        // FUNGSI UNDUH PDF LANGSUNG (EXISTING)
+        // ==============================================
+        function unduhPDF(jenis) {
+            const elementId = jenis === 'undangan' ? 'kertas-undangan' : 'kertas-permohonan';
+            const element = document.getElementById(elementId);
+            
+            const prefix = jenis === 'undangan' ? 'u' : 'p';
+            let nomorSurat = document.getElementById(`in-${prefix}-nomor`).value || 'Surat';
+            nomorSurat = nomorSurat.replace(/[\/\\:\*\?"<>\|]/g, '_');
+            const namaFile = `${jenis.toUpperCase()}_${nomorSurat}.pdf`;
+
+            const originalTransform = element.style.transform;
+            element.style.transform = 'none';
+
+            const opt = {
+                margin:       0,
+                filename:     namaFile,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { 
+                    scale: 2,           
+                    useCORS: true,      
+                    scrollY: 0          
+                },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            html2pdf().set(opt).from(element).save().then(() => {
+                element.style.transform = originalTransform; 
+            });
+        }
+
+        // ==============================================
+        // FUNGSI UI & TAB (EXISTING)
+        // ==============================================
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            document.getElementById('btn-' + tabId).classList.add('active');
+            document.getElementById('panel-' + tabId).classList.add('active');
+        }
+
+        function updateView(id, prefix) {
+            const inputEl = document.getElementById(`in-${prefix}-${id}`);
+            const targetEl = document.getElementById(`out-${prefix}-${id}`);
+            
+            if(!inputEl || !targetEl) return;
+            
+            const val = inputEl.value;
+
+            if (id === 'tempat' || id === 'hal') {
+                 if(id === 'tempat' && val.includes('(')) {
+                     targetEl.innerHTML = val.replace(/\(/g, '<br>(');
+                 } else {
+                     targetEl.innerText = val;
+                 }
+            } else if (id === 'isi' || id === 'pembuka') {
+                 targetEl.innerText = val;
+            } else {
+                targetEl.innerText = val;
+            }
+        }
+
+        function updateList(id, prefix) {
+            const inputEl = document.getElementById(`in-${prefix}-${id}`);
+            const targetEl = document.getElementById(`out-${prefix}-${id}`);
+            if(!inputEl || !targetEl) return;
+
+            const val = inputEl.value;
+            const lines = val.split('\n').filter(line => line.trim() !== '');
+            
+            let listHtml = '';
+            lines.forEach((line) => {
+                let txt = line;
+                if (txt.includes('RW.014') && txt.includes('Ketua RT')) {
+                    txt = txt.replace('RW.014', '<br>RW.014');
+                } else if (txt.includes('RW 014') && txt.includes('Warga')) {
+                    txt = txt.replace('RW 014', '<br>RW 014');
+                } else if (txt.toLowerCase().includes('ppsu kelurahan')) {
+                    txt = txt.replace(/Kelurahan/i, '<br>Kelurahan');
+                }
+                listHtml += `<li>${txt}</li>`;
+            });
+            
+            listHtml += `<div class="di-jakarta">
+                            <div>di</div>
+                            <div class="jkt-indent">Jakarta</div>
+                         </div>`;
+                         
+            targetEl.innerHTML = listHtml;
+        }
+
+        ['nomor', 'sifat', 'hal', 'tanggal-surat', 'pembuka', 'hari', 'tanggal-acara', 'waktu', 'tempat', 'acara', 'jabatan', 'nama-pejabat', 'nip'].forEach(id => updateView(id, 'u'));
+        updateList('kepada', 'u');
+        
+        ['nomor', 'sifat', 'hal', 'tanggal-surat', 'isi', 'jabatan', 'nama-pejabat', 'nip'].forEach(id => updateView(id, 'p'));
+        updateList('kepada', 'p');
+
+        function prosesOCR(e, prefix) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const ocrStatus = document.getElementById(`ocrStatus-${prefix}`);
+            ocrStatus.innerText = "Memproses kecerdasan buatan (AI)... Mohon tunggu.";
+            ocrStatus.style.color = "#ea580c";
+
+            Tesseract.recognize(
+                file,
+                'ind',
+                { logger: m => console.log(m) } 
+            ).then(({ data: { text } }) => {
+                const parseField = (regex) => {
+                    const match = text.match(regex);
+                    return match ? match[1].trim() : null;
+                };
+
+                const nomor = parseField(/Nomor\s*:\s*(.*)/i);
+                const sifat = parseField(/Sifat\s*:\s*(.*)/i);
+                const acara = parseField(/acara\s*:\s*(.*)/i);
+                const nip = parseField(/NIP\s*([0-9\s]+)/i);
+
+                if(nomor) { document.getElementById(`in-${prefix}-nomor`).value = nomor; updateView('nomor', prefix); }
+                if(sifat) { document.getElementById(`in-${prefix}-sifat`).value = sifat; updateView('sifat', prefix); }
+                if(nip) { document.getElementById(`in-${prefix}-nip`).value = nip.replace(/\s/g, ''); updateView('nip', prefix); }
+                
+                if(acara && prefix === 'u') { document.getElementById(`in-u-acara`).value = acara; updateView('acara', 'u'); }
+
+                ocrStatus.innerText = "Selesai! Silakan cek kembali inputan form Anda.";
+                ocrStatus.style.color = "#16a34a";
+            }).catch(err => {
+                console.error(err);
+                ocrStatus.innerText = "Gagal memindai teks dari gambar.";
+                ocrStatus.style.color = "#dc2626"; 
+            });
+        }
+
+        function resetForm() {
+            if(confirm('Kembalikan ke data bawaan?')) location.reload();
+        }
+
+        // ==============================================
+        // FUNGSI PENCARIAN KODE SURAT (EXISTING)
+        // ==============================================
+        let excelData = [];
+        let currentPrefix = '';
+
+        const databaseBawaan = [
+            ["PU.04.00", "Pemerintahan Umum (Stunting)"],
+            ["PU.04.00", "Pelaksanaan Urusan Pemerintah Daerah ( UMUM)"],
+            ["PU.04.00", "Pelaksanaan Urusan Pemerintah Daerah ( Undangan Grebek Jentik )"],
+            ["PU.04.00", "Pelaksanaan Urusan Pemerintah Daerah(Pelaksanaan Dan Laporan PSN )"],
+            ["PU.04.00", "Pelaksanaan Urusan Pemerintahan Daerah (Rapat Bidang Koordinasi Kesra)"],
+            ["PU.13.02", "Ketahanan Seni, Budaya, Adat, Agama, dan Kemasyarakatan"],
+            ["PU.10.00", "Penataan Ruang Wilayah"],
+            ["PU.10.04", "Pengendalian Lingkungan Hidup"],
+            ["HM.03.03", "Hubungan Dengan Perguruan Tinggi/ Sekolah"],
+            ["HM.01", "Dokumentasi/Liputan Kegiatan Dinas Pimpinan, Acara Kedinasan, dan Peristiwa-Peristiwa bidang masing-masing, dalam berbagai Media: Lembar/Foto/Video/Rekaman Suara/Multimedia"],
+            ["HM.03.05", "Forum Kehumasan (Musyawarag Masyarakat Desa)"],
+            ["IP/01.02", "Pelaksanaan Penelitian/Pengkajian"],
+            ["BM.01.00", "Lembaga Masyarakat (PKK)"],
+            ["BM.02.03", "Memberdayaan Adat Dan Sosial Budaya Masyarakat"],
+            ["PU.04.00", "Pelaksanaan Urusan Pemerintahan Daerah (AKMP)"],
+            ["PU.04.00", "Pelaksanaan Urusan Pemerintahan Daerah (Mohon Bantuan Kendaraan Kerja Bakti)"],
+            ["PU.04.00", "Pelaksanaan Urusan Pemerintahan Daerah( Laporan PPSU)"],
+            ["PU.04.00", "Pelaksanaan Urusan Pemerintahan Daerah (Rekomendasi )"],
+            ["PU.04.00", "Pelaksanaan Urusan Pemerintahan Daerah (Umum)"],
+            ["PU.04.00", "Pelaksanaan Urusan Pemerintahan Daerah (Laporan Hasil Kegiatan Penanganan dan Antisipasi Genangan Banjir)"],
+            ["PU.10.04", "Pengendalian Lingkungan Hidup"],
+            ["PU.13.02", "Ketahanan Seni, Budaya, Adat, Agama, dan Kemasyarakatan"],
+            ["RB.01.03", "Musrenbang Kecamatan"],
+            ["RB.01.02", "Musrenbang Provinsi"],
+            ["KI.00.01", "Komunikasi Dan Informasi"],
+            ["KA.02.02", "Pengelolaan Arsip Dinas"],
+            ["PA.01.00", "Pelaksanaan Pengawasan"],
+            ["DL.01.02", "Penyelenggaraan Diklat"],
+            ["PU.04.00", "Pemerintah Umum (Keamananan dan Ketertiban Umum)"],
+            ["BM.00.01", "Verponding"],
+            ["PU.04.00", "Pajak"],
+            ["BM.01.00", "Pembinaan Penataan Lembaga Masyarakat di Kelurahan"],
+            ["PU.01.04", "Koordinasi pelayanan administrasi Kecamatan"],
+            ["PU.04.00", "Pelaksanaan Urusan Pemerintahan Daerah (Rapat Koordinasi)"],
+            ["HM.03.00", "Hubungan Antar Badan Pemerintah (Reses)"],
+            ["KG.02.01", "Pengadaan Aparatur Sipil Negara (ASN)"],
+            ["KG.03.00", "Alih Tugas Aparatur Sipil Negara (ASN)"],
+            ["KG.03.01", "Sistim Informasi Kepegawaian"],
+            ["KG.11.00", "Surat Perintah Dinas/Surat Tugas"],
+            ["KG.12.01", "Kesejahteraan Pegawai"],
+            ["UD/00.03", "Dokumen. Perubahan Anggaran"],
+            ["UD.02.04", "Dokumen Penatausahaan Keuangan"],
+            ["HM.00.00", "Penyelengaraan Acara Kedinasaan Upacara"],
+            ["PN.04.02", "Dokumen Pengadaan Barang"],
+            ["PN.01.00", "Dokumen Pelaksanaan Pengadaan"]
+        ];
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            checkAuthOnLoad();
+
+            try {
+                const response = await fetch('Database Kode Surat.xlsx');
+                if (!response.ok) throw new Error('CORS Local File - Beralih ke fallback json');
+                
+                const arrayBuffer = await response.arrayBuffer();
+                const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+                const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+                
+                excelData = XLSX.utils.sheet_to_json(worksheet, { header: 1 }).slice(1);
+            } catch (error) {
+                excelData = databaseBawaan;
+            }
+        });
+
+        function bukaModalCari(prefix) {
+            currentPrefix = prefix;
+            document.getElementById('searchModal').classList.add('active');
+            
+            const inputCari = document.getElementById('cariKodeInput');
+            inputCari.value = ''; 
+            inputCari.style.display = 'block'; 
+            
+            tampilkanHasilPencarian(excelData);
+        }
+
+        function tutupModalCari() {
+            document.getElementById('searchModal').classList.remove('active');
+        }
+
+        function tampilkanHasilPencarian(data) {
+            const container = document.getElementById('searchResults');
+            container.innerHTML = '';
+            
+            if (!data || data.length === 0) {
+                container.innerHTML = '<div style="padding:15px; text-align:center; color:#64748b;">Tidak ada data ditemukan.</div>';
+                return;
+            }
+
+            data.forEach(row => {
+                if (!row || !Array.isArray(row) || row.length === 0) return;
+                
+                const kodeRaw = row[0] !== undefined && row[0] !== null ? row[0] : '';
+                const descRaw = row[1] !== undefined && row[1] !== null ? row[1] : '';
+
+                const kode = String(kodeRaw).trim();
+                const desc = String(descRaw).trim();
+
+                if (kode === '') return;
+
+                const div = document.createElement('div');
+                div.className = 'result-item';
+                div.onclick = () => pilihKode(kode, desc);
+                div.innerHTML = `
+                    <div class="result-kode">${kode}</div>
+                    <div class="result-desc">${desc}</div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function filterPencarian() {
+            const keyword = document.getElementById('cariKodeInput').value.toLowerCase().trim();
+            if (!excelData || excelData.length === 0) return;
+
+            const filtered = excelData.filter(row => {
+                if (!row || !Array.isArray(row) || row.length === 0) return false;
+                
+                const kode = row[0] !== undefined && row[0] !== null ? String(row[0]).toLowerCase() : '';
+                const desc = row[1] !== undefined && row[1] !== null ? String(row[1]).toLowerCase() : '';
+                
+                return kode.includes(keyword) || desc.includes(keyword);
+            });
+            
+            tampilkanHasilPencarian(filtered);
+        }
+
+        function pilihKode(kode, desc) {
+            const targetNomor = document.getElementById(`in-${currentPrefix}-nomor`);
+            if (targetNomor) {
+                targetNomor.value = kode;
+                updateView('nomor', currentPrefix); 
+            }
+
+            const targetHal = document.getElementById(`in-${currentPrefix}-hal`);
+            if (targetHal) {
+                targetHal.value = desc || ''; 
+                updateView('hal', currentPrefix); 
+            }
+
+            tutupModalCari();
+        }
+    </script>
+</body>
+</html>
