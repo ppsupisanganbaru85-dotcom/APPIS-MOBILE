@@ -191,7 +191,7 @@ body {
 .stage { position: relative; transform-style: preserve-3d; }
 .profile-center { width: var(--profile-size); height: var(--profile-size); border-radius: 50%; overflow: hidden; border: 4px solid var(--accent); position: relative; z-index: 10; box-shadow: 0 0 30px var(--ring-shadow); background: #1e293b; }
 .profile-center img { width: 100%; height: 100%; object-fit: cover; }
-.ring { position: absolute; top: 50%; left: 50%; transform-style: preserve-3d; animation: rotate3D var(--speed) linear infinite; }
+.ring { position: absolute; top: 70%; left: 50%; transform-style: preserve-3d; animation: rotate3D var(--speed) linear infinite; }
 .ring span { position: absolute; color: var(--accent); font-weight: 800; font-size: 0.95rem; white-space: nowrap; transform-origin: center; text-transform: uppercase; letter-spacing: 1px; }
 
 /* --- CAROUSEL SLIDERS --- */
@@ -276,12 +276,12 @@ body {
 .icon-box img { width: 42px; height: 42px; object-fit: contain; }
 .app-label { font-size: 0.75rem; color: var(--txt); font-weight: 600; text-align: center; }
 
-/* --- APP VIEWER --- */
-#app-viewer { position: fixed; inset: 0; background: #000; z-index: 9999; display: none; flex-direction: column; }
+/* --- APP VIEWER (IFRAME) --- */
+#app-viewer { position: fixed; inset: 0; background: var(--bg); z-index: 9999; display: none; flex-direction: column; }
 .viewer-header { height: 60px; background: var(--nav-bg); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; border-bottom: 1px solid var(--glass-border); }
-.btn-back-home { background: rgba(255,255,255,0.1); border: 1px solid var(--glass-border); color: white; padding: 8px 16px; border-radius: 10px; cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 8px; transition: 0.3s; }
+.btn-back-home { background: rgba(255,255,255,0.1); border: 1px solid var(--glass-border); color: var(--title); padding: 8px 16px; border-radius: 10px; cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 8px; transition: 0.3s; }
 .btn-back-home:hover { background: var(--accent); color: #000; }
-#app-iframe { flex: 1; border: none; width: 100%; height: 100%; }
+#app-iframe { flex: 1; border: none; width: 100%; height: 100%; background: #ffffff; }
 
 @keyframes rotate3D { from { transform: rotateY(0deg); } to { transform: rotateY(360deg); } }
 
@@ -370,10 +370,11 @@ body {
                 </div>
                 <ul class="nav-links" id="nav-links">
                     <li><a href="#" class="nav-item active" onclick="handleNavClick(event, this)">Beranda</a></li>
-                    <li><a href="#projects" class="nav-item" onclick="handleNavClick(event, this)">Aktivitas</a></li>
-                    <li><a href="#crm" class="nav-item" onclick="handleNavClick(event, this)">CRM Layanan Warga</a></li>
+                    <li><a href="#projects" class="nav-item" onclick="handleNavClick(event, this)">Program</a></li>
+                    <li><a href="#crm" class="nav-item" onclick="handleNavClick(event, this)">CRM </a></li>
                     <li><a href="#medsos" class="nav-item" onclick="handleNavClick(event, this)">Medsos</a></li>
-                    <li><a href="surat.html" class="nav-item" onclick="handleNavClick(event, this)">Modul</a></li>
+                    <!-- MENU ALAT DIPERBARUI: Sekarang mengarah (scroll) ke ID #tools di bawah -->
+                    <li><a href="#tools" class="nav-item" onclick="handleNavClick(event, this)">Alat</a></li>
                 </ul>
             </div>
 
@@ -400,12 +401,12 @@ body {
                 <div class="hero-left">
                     <div class="badge-tag">Kelurahan Pisangan Baru</div>
                     <h1>Aplikasi <span>PPSU</span> Pisangan Baru</h1>
-                    <p class="hero-desc">APPIS MOBILE Sistem manajemen operasional, Layanan PPSU Pisbar memudahkan Koordinasi untuk Pengurus RT/RW dan warga dengan PPSU real-time, jadwal permintaan layanan, dan pemantauan tindak lanjut petugas PPSU Kelurahan Pisangan Baru.</p>
+                    <p class="hero-desc">APPIS MOBILE Sistem manajemen operasional, Layanan PPSU Pisbar memudahkan Koordinasi untuk Pengurus RT/RW dan warga dengan PPSU Untuk Bersama-sama Menjaga Kebersihan Lingkungan, jadwal permintaan layanan, dan pemantauan tindak lanjut petugas PPSU Kelurahan Pisangan Baru.</p>
                     
                     <!-- ANIMASI TEXT TICKER -->
                     <div class="info-ticker">
                         <div class="ticker-item"><i class="fas fa-bolt"></i> Siaga Merespon Layanan Warga </div>
-                        <div class="ticker-item"><i class="fas fa-leaf"></i> Menjaga Lingkungan Pisbar Tetap Bersih</div>
+                        <div class="ticker-item"><i class="fas fa-leaf"></i> Mari Bersama Kita Menjaga Lingkungan Pisbar </div>
                         <div class="ticker-item"><i class="fas fa-bullhorn"></i> Transparansi Tindak Lanjut Terpantau</div>
                     </div>
 
@@ -447,7 +448,7 @@ body {
                 <div class="card-img" style="background: url('gambar2.jpeg') center/cover, #1e293b;"></div>
                 <div class="card-content">
                     <h3 class="card-title">Pemeliharaan Saluran</h3>
-                    <p style="font-size:0.8rem; opacity:0.6;">Pengerukan Got & Drainase • Fast Response</p>
+                    <p style="font-size:0.8rem; opacity:0.6;">Pengerukan sampah Got & Drainase • Fast Response</p>
                 </div>
             </div>
             <div class="card-item">
@@ -492,7 +493,7 @@ body {
                     <p style="font-size: 0.8rem; opacity: 0.6;">Transparansi Penanganan Wilayah oleh Petugas PPSU</p>
                 </div>
                 <button class="btn-3d" onclick="openCreateComplaintModal()" style="background:var(--accent); color:#000; width:auto; padding:10px 20px;">
-                    <i class="fas fa-plus"></i> Buat Laporan Pengaduan
+                    <i class="fas fa-plus"></i> Buat Pengajuan
                 </button>
             </div>
 
@@ -547,36 +548,38 @@ body {
                     <button class="btn-see-all" id="btn-see-all" style="background:rgba(16,185,129,0.1); border:none; color:var(--success); padding:8px 16px; border-radius:50px; font-weight:700; cursor:pointer;">Lihat Semua</button>
                 </div>
                 
+                <!-- LINK PADA GRID DIPERBARUI: Menggunakan fungsi onclick="openApp()" -->
                 <div class="apps-grid" id="apps-grid">
-                    <a href="ppsu_laporan.html" class="app-item">
+                    <a href="#" onclick="openApp(event, 'ppsu_laporan.html', 'Laporan Harian')" class="app-item">
                         <div class="icon-box"><img src="letter.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3209/3209265.png'"></div>
                         <span class="app-label">Laporan Harian</span>
                     </a>
-                    <a href="https://appistracking.vercel.app/" class="app-item" target="_blank">
+                    <a href="#" onclick="openApp(event, 'https://appistracking.vercel.app/', 'Jadwal Tracking')" class="app-item">
                         <div class="icon-box"><img src="job.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3652/3652191.png'"></div>
                         <span class="app-label">Jadwal</span>
                     </a>
-                    <a href="appkelurahan.html" class="app-item">
+                    <a href="#" onclick="openApp(event, 'surat.html', 'Scanner Surat')" class="app-item">
                         <div class="icon-box"><img src="ikonlayanan.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/1042/1042339.png'"></div>
                         <span class="app-label">Scanner Surat</span>
                     </a>
-                    <a href="https://apismobile.netlify.app/" class="app-item">
+                    <a href="#" onclick="openApp(event, 'https://apismobile.netlify.app/', 'Arsip Digital')" class="app-item">
                         <div class="icon-box"><img src="folder.png"></div>
                         <span class="app-label">Arsip Digital</span>
                     </a>
-                    <a href="https://script.google.com/macros/s/AKfycbxU60g__l9ssw4DHJmD67nc4-wEJ5Ul7PoRZ2kXxXpn3Pws_8l_C7jpYladKZfvSjE6IA/exec" class="app-item" target="_blank">
+                    <a href="#" onclick="openApp(event, 'https://script.google.com/macros/s/AKfycbxU60g__l9ssw4DHJmD67nc4-wEJ5Ul7PoRZ2kXxXpn3Pws_8l_C7jpYladKZfvSjE6IA/exec', 'Pilah Sampah')" class="app-item">
                         <div class="icon-box"><img src="e-commeerce.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3299/3299935.png'"></div>
                         <span class="app-label">Pilah Sampah</span>
                     </a>
-                    <a href="earsip.html" class="app-item">
+                    <a href="#" onclick="openApp(event, 'https://siskapis.netlify.app/', 'Siska Dashboard')" class="app-item">
                         <div class="icon-box"><img src="siska.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2991/2991112.png'"></div>
                         <span class="app-label">Siska</span>
                     </a>
-                    <a href="https://rekapabsenppsu.netlify.app/" class="app-item" target="_blank">
+                    <a href="#" onclick="openApp(event, 'https://rekapabsenppsu.netlify.app/', 'AI Assistant')" class="app-item">
                         <div class="icon-box"><img src="ai.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/8649/8649595.png'"></div>
-                        <span class="app-label">Assistant Rekap</span>
+                        <span class="app-label">Assistant </span>
                     </a>
-                    <a href="https://youtube.com/@elfidachannel" class="app-item" target="_blank">
+                    <!-- Catatan: Jika YouTube memblokir akses iframe (karena kebijakan keamanan Google), ganti baris bawah ini kembali menjadi target="_blank" -->
+                    <a href="#" onclick="openApp(event, 'https://youtube.com/@elfidachannel', 'Dokumentasi YT')" class="app-item">
                         <div class="icon-box"><img src="youtube.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/1384/1384060.png'"></div>
                         <span class="app-label">Dokumentasi YT</span>
                     </a>
@@ -588,7 +591,7 @@ body {
     <!-- MODAL 1: FORM BUAT PENGADUAN WARGA -->
     <div class="custom-modal" id="modalCreateComplaint">
         <div class="modal-body">
-            <h3 style="margin-bottom:15px; color:var(--title);">Form Permohonan Warga</h3>
+            <h3 style="margin-bottom:15px; color:var(--title);">Form Pengajuan Warga</h3>
             <form id="formCreateComplaint" onsubmit="submitComplaint(event)">
                 <input type="text" id="cmpNama" class="login-input" placeholder="Nama Pelapor Lengkap" required>
                 <input type="tel" id="cmpWa" class="login-input" placeholder="Nomor WhatsApp" required>
@@ -601,7 +604,7 @@ body {
                 
                 <textarea id="cmpDeskripsi" class="login-input" placeholder="Deskripsi Detail Permintaan / Masalah" rows="3" required></textarea>
                 
-                <label style="font-size:0.75rem; opacity:0.7; display:block; margin-bottom:5px;">Unggah Foto Lokasi Kejadian:</label>
+                <label style="font-size:0.75rem; opacity:0.7; display:block; margin-bottom:5px;">Unggah Foto Lokasi Laporan</label>
                 <input type="file" id="cmpFoto" class="login-input" accept="image/*" required>
                 
                 <div style="display:flex; gap:10px; margin-top:10px;">
@@ -634,13 +637,14 @@ body {
         </div>
     </div>
 
-    <!-- 4. APP VIEWER IFRAME MODAL -->
+    <!-- 4. APP VIEWER IFRAME MODAL DIPERBARUI -->
     <div id="app-viewer">
         <div class="viewer-header">
             <button class="btn-back-home" onclick="closeApp()">
                 <i class="fas fa-arrow-left"></i> Kembali ke Dashboard
             </button>
-            <span style="font-size:0.8rem; opacity:0.7; font-weight:600; color:white;">APPIS Sub-Portal</span>
+            <!-- ID ditambahkan pada title bar iframe untuk manipulasi teks otomatis -->
+            <span id="viewer-title" style="font-size:0.85rem; opacity:0.9; font-weight:700; color:var(--title);">APPIS Sub-Portal</span>
         </div>
         <iframe id="app-iframe" title="Frame Aplikasi"></iframe>
     </div>
@@ -651,7 +655,8 @@ body {
         <a href="#projects" class="bnav-item" onclick="handleBNav(this)"><i class="fas fa-layer-group"></i><span>Program</span></a>
         <a href="#crm" class="bnav-item" onclick="handleBNav(this)"><i class="fas fa-comments"></i><span>CRM</span></a>
         <a href="#medsos" class="bnav-item" onclick="handleBNav(this)"><i class="fas fa-share-nodes"></i><span>Medsos</span></a>
-        <a href="#tools" class="bnav-item" onclick="handleBNav(this)"><i class="fas fa-border-all"></i><span>Modul</span></a>
+        <!-- MENU ALAT DIPERBARUI: Sekarang mengarah (scroll) ke ID #tools di bawah -->
+        <a href="#tools" class="bnav-item" onclick="handleBNav(this)"><i class="fas fa-border-all"></i><span>Alat</span></a>
     </nav>
 
     <!-- JS LOGIC INTEGRATED -->
@@ -678,7 +683,7 @@ body {
             }
         }, 30);
 
-        // --- 1B. FUNGSI MODE GELAP / TERANG (DITAMBAHKAN) ---
+        // --- 1B. FUNGSI MODE GELAP / TERANG ---
         const modeToggle = document.getElementById('mode-toggle');
         if (modeToggle) {
             modeToggle.addEventListener('click', () => {
@@ -695,14 +700,13 @@ body {
             });
         }
 
-        // --- 1C. FUNGSI CINCIN TEKS 3D (DITAMBAHKAN) ---
+        // --- 1C. FUNGSI CINCIN TEKS 3D ---
         function initRing() {
             const ring = document.getElementById('ring');
             if (!ring) return;
             ring.innerHTML = '';
             const text = "PPSU PISANGAN BARU • APPIS MOBILE • ";
             
-            // Atur radius rotasi 3D berdasarkan lebar profil (responsive)
             const isMobile = window.innerWidth <= 600;
             const radius = isMobile ? 100 : 135; 
             
@@ -717,25 +721,24 @@ body {
             });
         }
 
-        // --- 1D. NAVIGASI SLIDER CAROUSEL & AUTO SCROLL (DITAMBAHKAN) ---
+        // --- 1D. NAVIGASI SLIDER CAROUSEL & AUTO SCROLL ---
         const layananSlider = document.getElementById('layanan-slider');
         const btnPrev = document.getElementById('layanan-prev');
         const btnNext = document.getElementById('layanan-next');
         
         let autoScrollInterval;
-        const scrollAmount = 300; // Jarak scroll
+        const scrollAmount = 300; 
 
         function startAutoScroll() {
             autoScrollInterval = setInterval(() => {
                 if (layananSlider) {
-                    // Cek apakah slider sudah mentok sampai paling kanan
                     if (layananSlider.scrollLeft + layananSlider.clientWidth >= layananSlider.scrollWidth - 10) {
-                        layananSlider.scrollTo({ left: 0, behavior: 'smooth' }); // Ulangi ke awal
+                        layananSlider.scrollTo({ left: 0, behavior: 'smooth' }); 
                     } else {
                         layananSlider.scrollBy({ left: scrollAmount, behavior: 'smooth' });
                     }
                 }
-            }, 3000); // Waktu jeda auto-scroll: 3 detik
+            }, 3000); 
         }
 
         function stopAutoScroll() {
@@ -743,9 +746,7 @@ body {
         }
 
         if (layananSlider) {
-            startAutoScroll(); // Mulai otomatisasi saat halaman siap
-            
-            // Jeda scroll otomatis jika kursor sedang berada di atas area carousel
+            startAutoScroll(); 
             layananSlider.addEventListener('mouseenter', stopAutoScroll);
             layananSlider.addEventListener('mouseleave', startAutoScroll);
             layananSlider.addEventListener('touchstart', stopAutoScroll, {passive: true});
@@ -755,7 +756,6 @@ body {
         if (btnPrev && layananSlider) {
             btnPrev.addEventListener('click', () => {
                 layananSlider.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
-                // Reset timer jika user menekan tombol manual agar tidak tumpang tindih
                 stopAutoScroll();
                 startAutoScroll();
             });
@@ -763,13 +763,12 @@ body {
         if (btnNext && layananSlider) {
             btnNext.addEventListener('click', () => {
                 layananSlider.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-                // Reset timer jika user menekan tombol manual agar tidak tumpang tindih
                 stopAutoScroll();
                 startAutoScroll();
             });
         }
 
-        // --- 1E. FUNGSI TOMBOL "LIHAT SEMUA" PADA APPS GRID (DITAMBAHKAN) ---
+        // --- 1E. FUNGSI TOMBOL "LIHAT SEMUA" PADA APPS GRID ---
         const btnSeeAll = document.getElementById('btn-see-all');
         const appsGrid = document.getElementById('apps-grid');
         if(btnSeeAll && appsGrid) {
@@ -841,7 +840,6 @@ body {
                 if(user.role) document.getElementById('userDisplayRole').innerText = user.role;
             }
 
-            // Inisialisasi cincin 3D Profil
             if(typeof initRing === "function") initRing();
             
             fetchComplaints();
@@ -1086,7 +1084,6 @@ body {
                 const fotoFile = document.getElementById('rspFoto').files[0];
                 const base64Foto = await fileToBase64(fotoFile);
 
-                // Update data keluhan di penyimpanan lokal untuk rendering sementara
                 const index = localComplaints.findIndex(c => c.id === id);
                 if (index !== -1) {
                     localComplaints[index].status = status;
@@ -1098,7 +1095,6 @@ body {
                 closeModal('modalRespondComplaint');
                 document.getElementById('formRespondComplaint').reset();
 
-                // Kirim respon pembaruan ke server Google Apps Script
                 await fetch(GAS_API_URL, {
                     method: "POST",
                     headers: { "Content-Type": "text/plain" },
@@ -1119,12 +1115,31 @@ body {
             }
         }
 
-        // --- 5. FUNGSI MENUTUP APP VIEWER ---
+        // --- 5. FUNGSI MEMBUKA & MENUTUP APP VIEWER (IFRAME MODAL) ---
+        function openApp(event, url, appName) {
+            if(event) event.preventDefault(); // Mencegah reload/tab baru
+            
+            const appViewer = document.getElementById('app-viewer');
+            const iframe = document.getElementById('app-iframe');
+            const viewerTitle = document.getElementById('viewer-title');
+            
+            // Ubah teks judul sesuai aplikasi yang sedang dibuka
+            if (viewerTitle) {
+                viewerTitle.innerText = appName || "APPIS Sub-Portal";
+            }
+            
+            // Masukkan link tujuan ke iframe
+            iframe.src = url;
+            
+            // Tampilkan layar overlay
+            appViewer.style.display = 'flex';
+        }
+
         function closeApp() {
             const appViewer = document.getElementById('app-viewer');
             const iframe = document.getElementById('app-iframe');
             if (appViewer) appViewer.style.display = 'none';
-            if (iframe) iframe.src = '';
+            if (iframe) iframe.src = ''; // Kosongkan iframe saat ditutup agar memory ringan
         }
 
     </script>
