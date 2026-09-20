@@ -448,11 +448,11 @@ const resultStore = new WeakMap();
 ========================================================== */
 function applyAvatars(){
   // Logo
-  const logo = document.getElementById("logoImg");
+  const logo = document.getElementById("Ai.png");
   if(logo) logo.src = CONFIG.botAvatar;
 
   // Semua avatar bot yang ada
-  document.querySelectorAll(".bot-avatar").forEach(img => {
+  document.querySelectorAll("Ai.png").forEach(img => {
     img.src = CONFIG.botAvatar;
   });
 }
