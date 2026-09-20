@@ -198,7 +198,7 @@ body {
 .slider-header { display: flex; justify-content: space-between; align-items: center; padding: 0 5%; margin-bottom: 15px; margin-top: 40px; }
 .section-title { font-size: 1.3rem; font-weight: 800; color: var(--title); }
 .slider-nav-btns { display: flex; gap: 10px; }
-.btn-slide { background: var(--card-bg); border: 1px solid var(--glass-border); color: var(--txt); width: 38px; height: 38px; border-radius: 50%; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; }
+.btn-slide { background: var(--card-bg); border: 1px solid var(--glass-border); color: var(--txt); width: 40px; height: 40px; border-radius: 50%; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; }
 .btn-slide:hover { background: var(--accent); color: #000; }
 
 .carousel-container { 
@@ -544,15 +544,15 @@ body {
         <section class="apps-section" id="tools">
             <div class="apps-container">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px;">
-                    <h3 class="section-title">Fitur & Sub-Aplikasi</h3>
+                    <h3 class="section-title">Fitur </h3>
                     <button class="btn-see-all" id="btn-see-all" style="background:rgba(16,185,129,0.1); border:none; color:var(--success); padding:8px 16px; border-radius:50px; font-weight:700; cursor:pointer;">Lihat Semua</button>
                 </div>
                 
                 <!-- LINK PADA GRID DIPERBARUI: Menggunakan fungsi onclick="openApp()" -->
                 <div class="apps-grid" id="apps-grid">
-                    <a href="#" onclick="openApp(event, 'ppsu_laporan.html', 'Laporan Harian')" class="app-item">
+                    <a href="#" onclick="openApp(event, 'https://rekapabsenppsu.netlify.app/', 'Laporan Harian')" class="app-item">
                         <div class="icon-box"><img src="letter.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3209/3209265.png'"></div>
-                        <span class="app-label">Laporan Harian</span>
+                        <span class="app-label">Alat Rekap</span>
                     </a>
                     <a href="#" onclick="openApp(event, 'https://appistracking.vercel.app/', 'Jadwal Tracking')" class="app-item">
                         <div class="icon-box"><img src="job.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3652/3652191.png'"></div>
@@ -560,7 +560,7 @@ body {
                     </a>
                     <a href="#" onclick="openApp(event, 'surat.html', 'Scanner Surat')" class="app-item">
                         <div class="icon-box"><img src="ikonlayanan.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/1042/1042339.png'"></div>
-                        <span class="app-label">Scanner Surat</span>
+                        <span class="app-label">Pembuat Surat</span>
                     </a>
                     <a href="#" onclick="openApp(event, 'https://apismobile.netlify.app/', 'Arsip Digital')" class="app-item">
                         <div class="icon-box"><img src="folder.png"></div>
@@ -576,7 +576,7 @@ body {
                     </a>
                     <a href="#" onclick="openApp(event, 'https://rekapabsenppsu.netlify.app/', 'AI Assistant')" class="app-item">
                         <div class="icon-box"><img src="ai.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/8649/8649595.png'"></div>
-                        <span class="app-label">Assistant </span>
+                        <span class="app-label">Assistant AI </span>
                     </a>
                     <!-- Catatan: Jika YouTube memblokir akses iframe (karena kebijakan keamanan Google), ganti baris bawah ini kembali menjadi target="_blank" -->
                     <a href="#" onclick="openApp(event, 'https://youtube.com/@elfidachannel', 'Dokumentasi YT')" class="app-item">
@@ -644,7 +644,7 @@ body {
                 <i class="fas fa-arrow-left"></i> Kembali ke Dashboard
             </button>
             <!-- ID ditambahkan pada title bar iframe untuk manipulasi teks otomatis -->
-            <span id="viewer-title" style="font-size:0.85rem; opacity:0.9; font-weight:700; color:var(--title);">APPIS Sub-Portal</span>
+            <span id="viewer-title" style="font-size:0.85rem; opacity:0.9; font-weight:700; color:var(--title);">APPIS Fitur</span>
         </div>
         <iframe id="app-iframe" title="Frame Aplikasi"></iframe>
     </div>
