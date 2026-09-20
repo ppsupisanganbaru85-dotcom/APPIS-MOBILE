@@ -402,17 +402,34 @@
         .result-kode { font-weight: bold; color: var(--primary-dark); font-size: 0.95rem; }
         .result-desc { font-size: 0.85rem; color: #475569; margin-top: 4px; }
 
+        /* ========= PERBAIKAN CSS CETAK (PRINT) ========= */
         @media print {
+            /* Pastikan background (logo/warna) tercetak */
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
             @page { size: A4; margin: 0; }
             body, html { height: auto; background: white; overflow: visible; }
-            .tab-nav, .panel-input, .login-overlay { display: none !important; }
             
-            .panel-preview.active { 
+            /* Sembunyikan elemen yang tidak perlu dicetak */
+            .tab-nav, .panel-input, .login-overlay, .modal-overlay { display: none !important; }
+            
+            /* Sembunyikan semua preview secara default saat proses print dipanggil */
+            .panel-preview { display: none !important; }
+
+            /* PERBAIKAN BUG: Hanya tampilkan halaman A4 yang diminta oleh atribut data-print */
+            body[data-print="undangan"] #panel-out-undangan { 
                 display: block !important; padding: 0; background: none; overflow: visible; 
             }
+            body[data-print="permohonan"] #panel-out-permohonan { 
+                display: block !important; padding: 0; background: none; overflow: visible; 
+            }
+
             .a4-paper {
-                box-shadow: none; transform: none !important; margin: 0; width: 210mm;
-                height: 297mm; page-break-after: always;
+                box-shadow: none !important; transform: none !important; margin: 0 !important; width: 210mm !important;
+                height: 297mm !important; /* Fixed ukuran height tanpa terpengaruh isian berlebih */
             }
         }
     </style>
@@ -468,7 +485,8 @@
         </div>
 
         <div class="btn-group">
-            <button class="btn btn-3d" onclick="window.print()">🖨️ Cetak Print</button>
+            <!-- PERBAIKAN TOMBOL CETAK -->
+            <button class="btn btn-3d" onclick="cetakSurat('undangan')">🖨️ Cetak Print</button>
             <button class="btn btn-3d btn-download" onclick="unduhPDF('undangan')">📥 Unduh PDF</button>
             <button class="btn btn-3d-secondary" onclick="resetForm()">🔄 Reset Data</button>
         </div>
@@ -511,7 +529,8 @@ LMK RW.014</textarea></div>
         <div class="form-group"><label>NIP</label><input type="text" class="form-control" id="in-u-nip" value="1981112210012220" oninput="updateView('nip', 'u')"></div>
         
         <div style="display: flex; gap: 10px; margin-top: 20px;">
-            <button class="btn btn-3d" style="flex:1; padding: 18px;" onclick="window.print()">🖨️ Print Surat</button>
+            <!-- PERBAIKAN TOMBOL CETAK BAWAH -->
+            <button class="btn btn-3d" style="flex:1; padding: 18px;" onclick="cetakSurat('undangan')">🖨️ Print Surat</button>
             <button class="btn btn-3d btn-download" style="flex:1; padding: 18px;" onclick="unduhPDF('undangan')">📥 Simpan PDF</button>
         </div>
         <div style="height: 60px;"></div>
@@ -591,7 +610,8 @@ LMK RW.014</textarea></div>
         </div>
 
         <div class="btn-group">
-            <button class="btn btn-3d" onclick="window.print()">🖨️ Cetak Print</button>
+            <!-- PERBAIKAN TOMBOL CETAK -->
+            <button class="btn btn-3d" onclick="cetakSurat('permohonan')">🖨️ Cetak Print</button>
             <button class="btn btn-3d btn-download" onclick="unduhPDF('permohonan')">📥 Unduh PDF</button>
             <button class="btn btn-3d-secondary" onclick="resetForm()">🔄 Reset Data</button>
         </div>
@@ -634,7 +654,8 @@ Demikian surat permohonan ini kami sampaikan, atas perhatian dan bantuan Bapak/I
         <div class="form-group"><label>NIP</label><input type="text" class="form-control" id="in-p-nip" value="1981112210012220" oninput="updateView('nip', 'p')"></div>
         
         <div style="display: flex; gap: 10px; margin-top: 20px;">
-            <button class="btn btn-3d" style="flex:1; padding: 18px;" onclick="window.print()">🖨️ Print Surat</button>
+            <!-- PERBAIKAN TOMBOL CETAK BAWAH -->
+            <button class="btn btn-3d" style="flex:1; padding: 18px;" onclick="cetakSurat('permohonan')">🖨️ Print Surat</button>
             <button class="btn btn-3d btn-download" style="flex:1; padding: 18px;" onclick="unduhPDF('permohonan')">📥 Simpan PDF</button>
         </div>
         <div style="height: 60px;"></div>
@@ -708,6 +729,20 @@ Demikian surat permohonan ini kami sampaikan, atas perhatian dan bantuan Bapak/I
     </div>
 
     <script>
+        // ==============================================
+        // FUNGSI PERBAIKAN BUG CETAK (PRINT)
+        // ==============================================
+        function cetakSurat(jenis) {
+            // Beritahu CSS surat mana yang harus dipaksa tampil saat proses cetak
+            document.body.setAttribute('data-print', jenis);
+            
+            // Panggil dialog print browser
+            window.print();
+            
+            // Hapus kembali atribut setelah selesai dicetak agar tampilan web kembali normal
+            document.body.removeAttribute('data-print');
+        }
+
         // ==============================================
         // FUNGSI SISTEM LOGIN & AUTENTIKASI (NEW)
         // ==============================================
