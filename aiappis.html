@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#0a0e1a">
+<title>AI Appis- Pencari Kode Surat</title>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#0a0e1a;color:#e2e8f0;overflow:hidden}
+:root{
+  --bg:#0a0e1a;--bg-card:#141a2e;--bg-elev:#1e2540;--border:#252d47;
+  --accent:#38bdf8;--accent-2:#818cf8;--accent-hover:#0ea5e9;
+  --success:#10b981;--warn:#fbbf24;--error:#ef4444;
+  --text:#e2e8f0;--text-dim:#8b95b0;
+  --grad:linear-gradient(135deg,#38bdf8,#818cf8);
+}
+
+.app{display:flex;flex-direction:column;height:100dvh;max-width:760px;margin:0 auto;background:var(--bg);position:relative}
+
+/* ========== HEADER ========== */
+.app-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 14px;background:rgba(20,26,46,.9);backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);flex-shrink:0;z-index:10;
+}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-img{
+  width:42px;height:42px;border-radius:50%;object-fit:cover;
+  border:2px solid transparent;
+  background:linear-gradient(var(--bg-card),var(--bg-card)) padding-box,
+             var(--grad) border-box;
+  box-shadow:0 3px 14px rgba(56,189,248,.35);
+  animation:pulse 3s ease-in-out infinite;
+}
+@keyframes pulse{0%,100%{box-shadow:0 3px 14px rgba(56,189,248,.35)}50%{box-shadow:0 3px 22px rgba(129,140,248,.55)}}
+.logo-text h1{font-size:15px;font-weight:600;display:flex;align-items:center;gap:6px}
+.logo-text h1 .badge{
+  font-size:9px;background:var(--grad);padding:2px 6px;border-radius:20px;
+  font-weight:700;letter-spacing:.5px;text-transform:uppercase;
+}
+.logo-text p{font-size:11px;color:var(--text-dim);display:flex;align-items:center;gap:4px;margin-top:2px}
+.status-dot{width:6px;height:6px;border-radius:50%;background:var(--success);animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+.header-actions{display:flex;gap:6px;align-items:center}
+.btn-icon{
+  background:var(--bg-elev);border:1px solid var(--border);color:#fff;
+  width:38px;height:38px;border-radius:10px;font-size:16px;cursor:pointer;
+  transition:all .2s;display:flex;align-items:center;justify-content:center;
+  position:relative;
+}
+.btn-icon:hover{background:var(--accent);border-color:var(--accent);transform:translateY(-1px)}
+.btn-icon:active{transform:scale(.92)}
+
+/* ========== INFO PANEL (HIDDEN) ========== */
+.info-panel{
+  position:absolute;top:60px;right:14px;
+  background:var(--bg-card);border:1px solid var(--border);
+  border-radius:14px;padding:14px;z-index:50;
+  box-shadow:0 20px 50px rgba(0,0,0,.6);
+  opacity:0;transform:translateY(-10px) scale(.95);
+  pointer-events:none;transition:all .25s;
+  min-width:220px;
+}
+.info-panel.show{opacity:1;transform:translateY(0) scale(1);pointer-events:auto}
+.info-panel h4{
+  font-size:11px;color:var(--text-dim);text-transform:uppercase;
+  letter-spacing:.8px;margin-bottom:10px;display:flex;align-items:center;gap:6px;
+}
+.info-row{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:7px 0;font-size:13px;border-bottom:1px solid var(--border);
+}
+.info-row:last-child{border-bottom:none}
+.info-row .label{color:var(--text-dim);font-size:12px}
+.info-row .value{font-weight:700;color:var(--accent);font-size:14px}
+.info-row .value.green{color:var(--success)}
+
+/* ========== CHAT BOX ========== */
+.chat-box{
+  flex:1;overflow-y:auto;padding:18px 14px;
+  display:flex;flex-direction:column;gap:16px;scroll-behavior:smooth;
+  background:radial-gradient(circle at 20% 10%,rgba(56,189,248,.06),transparent 40%),
+             radial-gradient(circle at 80% 80%,rgba(129,140,248,.06),transparent 40%);
+}
+.chat-box::-webkit-scrollbar{width:6px}
+.chat-box::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+
+.message{display:flex;gap:10px;animation:slideIn .4s ease;align-items:flex-start}
+@keyframes slideIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.message.user{flex-direction:row-reverse}
+
+/* Avatar gambar */
+.avatar-img{
+  width:36px;height:36px;border-radius:50%;flex-shrink:0;
+  object-fit:cover;border:2px solid var(--border);
+  box-shadow:0 3px 10px rgba(0,0,0,.3);
+}
+.message.bot .avatar-img{border-color:rgba(56,189,248,.5);box-shadow:0 3px 12px rgba(56,189,248,.3)}
+.message.user .avatar-img{border-color:rgba(16,185,129,.5);box-shadow:0 3px 12px rgba(16,185,129,.3)}
+
+.bubble{
+  max-width:82%;padding:11px 15px;border-radius:16px;font-size:14px;
+  line-height:1.55;word-wrap:break-word;overflow-wrap:break-word;
+  box-shadow:0 2px 8px rgba(0,0,0,.15);
+}
+.bot .bubble{background:var(--bg-card);border:1px solid var(--border);border-top-left-radius:4px}
+.user .bubble{background:var(--grad);color:#0a0e1a;border-top-right-radius:4px;font-weight:500}
+.bot .bubble em{color:var(--accent);font-style:normal}
+
+.typing{display:flex;gap:4px;padding:6px 2px}
+.typing span{width:7px;height:7px;border-radius:50%;background:var(--accent);animation:bounce 1.4s infinite}
+.typing span:nth-child(2){animation-delay:.15s;background:var(--accent-2)}
+.typing span:nth-child(3){animation-delay:.3s}
+@keyframes bounce{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-6px);opacity:1}}
+
+/* ========== HASIL ========== */
+.result-list{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.result-card{
+  background:var(--bg);border:1px solid var(--border);border-radius:12px;
+  padding:11px 13px;cursor:pointer;transition:all .25s;
+  position:relative;overflow:hidden;
+}
+.result-card::before{
+  content:'';position:absolute;left:0;top:0;bottom:0;width:3px;
+  background:var(--grad);transition:width .3s;
+}
+.result-card:hover{background:var(--bg-elev);transform:translateX(3px);border-color:var(--accent)}
+.result-card:hover::before{width:5px}
+.result-card:active{transform:scale(.98)}
+.result-card.learned{border-color:rgba(16,185,129,.4)}
+.result-card.learned::before{background:linear-gradient(135deg,#10b981,#059669)}
+.result-header{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:5px}
+.result-kode{
+  font-family:'SF Mono','Courier New',monospace;font-weight:700;
+  font-size:14px;color:var(--accent);letter-spacing:.5px;
+  display:flex;align-items:center;gap:6px;flex-wrap:wrap;
+}
+.learned-tag{
+  font-size:9px;background:rgba(16,185,129,.15);color:#10b981;
+  padding:2px 6px;border-radius:8px;font-weight:600;letter-spacing:.3px;
+}
+.result-skor{font-size:10px;padding:3px 8px;border-radius:10px;font-weight:700;white-space:nowrap}
+.skor-tinggi{background:rgba(16,185,129,.18);color:#10b981}
+.skor-sedang{background:rgba(251,191,36,.18);color:#fbbf24}
+.skor-rendah{background:rgba(239,68,68,.18);color:#ef4444}
+.result-judul{font-size:12.5px;color:#cbd5e1;line-height:1.45}
+
+.feedback{
+  display:flex;gap:6px;margin-top:10px;padding-top:10px;
+  border-top:1px dashed var(--border);align-items:center;flex-wrap:wrap;
+}
+.feedback-label{font-size:11px;color:var(--text-dim);margin-right:4px}
+.fb-btn{
+  background:var(--bg);border:1px solid var(--border);color:var(--text);
+  padding:5px 10px;border-radius:8px;font-size:11px;cursor:pointer;
+  transition:all .2s;display:flex;align-items:center;gap:4px;
+}
+.fb-btn:hover{background:var(--bg-elev);border-color:var(--accent)}
+.fb-btn.yes:hover{background:rgba(16,185,129,.2);border-color:var(--success);color:var(--success)}
+.fb-btn.no:hover{background:rgba(239,68,68,.2);border-color:var(--error);color:var(--error)}
+.fb-btn:active{transform:scale(.94)}
+
+/* ========== CHIPS ========== */
+.chips{
+  display:flex;gap:6px;padding:8px 12px;overflow-x:auto;
+  background:rgba(20,26,46,.6);border-top:1px solid var(--border);
+  scrollbar-width:none;flex-shrink:0;
+}
+.chips::-webkit-scrollbar{display:none}
+.chip{
+  background:var(--bg-card);border:1px solid var(--border);color:var(--text);
+  padding:7px 13px;border-radius:20px;font-size:12px;cursor:pointer;
+  white-space:nowrap;transition:all .2s;flex-shrink:0;font-weight:500;
+}
+.chip:hover,.chip:active{background:var(--grad);color:#0a0e1a;border-color:transparent;transform:translateY(-1px)}
+
+/* ========== INPUT ========== */
+.input-area{
+  display:flex;gap:8px;padding:12px;background:var(--bg-card);
+  border-top:1px solid var(--border);flex-shrink:0;align-items:flex-end;
+}
+.input-wrapper{
+  flex:1;background:var(--bg);border:1px solid var(--border);
+  border-radius:14px;padding:4px 4px 4px 14px;transition:border-color .2s;
+  display:flex;align-items:center;gap:6px;
+}
+.input-wrapper:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px rgba(56,189,248,.1)}
+.input-wrapper input{
+  flex:1;padding:10px 0;border:none;background:transparent;
+  color:var(--text);font-size:14px;outline:none;
+}
+.input-wrapper input::placeholder{color:#64748b}
+
+#btnKirim{
+  width:44px;height:44px;border:none;border-radius:12px;
+  background:var(--grad);color:#0a0e1a;font-size:17px;cursor:pointer;
+  transition:all .2s;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 14px rgba(56,189,248,.35);
+}
+#btnKirim:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(56,189,248,.5)}
+#btnKirim:active{transform:scale(.92)}
+#btnKirim:disabled{opacity:.4;cursor:not-allowed;transform:none}
+
+/* ========== TOAST ========== */
+.toast{
+  position:fixed;bottom:100px;left:50%;
+  transform:translateX(-50%) translateY(20px);
+  background:var(--bg-elev);color:#fff;padding:11px 18px;
+  border-radius:12px;font-size:13px;opacity:0;pointer-events:none;
+  transition:all .3s;z-index:200;
+  box-shadow:0 12px 32px rgba(0,0,0,.5);max-width:80vw;text-align:center;
+  border:1px solid var(--border);
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.success{background:rgba(16,185,129,.95);border-color:var(--success)}
+.toast.error{background:rgba(239,68,68,.95);border-color:var(--error)}
+.toast.info{background:rgba(56,189,248,.95);color:#0a0e1a;border-color:var(--accent)}
+
+/* ========== MODAL ========== */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);
+  display:flex;align-items:center;justify-content:center;z-index:300;
+  padding:20px;opacity:0;pointer-events:none;transition:opacity .3s;
+}
+.modal-overlay.show{opacity:1;pointer-events:auto}
+.modal{
+  background:var(--bg-card);border:1px solid var(--border);border-radius:16px;
+  padding:24px;max-width:400px;width:100%;
+  transform:scale(.9);transition:transform .3s;
+  box-shadow:0 20px 60px rgba(0,0,0,.5);
+}
+.modal-overlay.show .modal{transform:scale(1)}
+.modal h3{font-size:17px;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.modal p{font-size:13px;color:var(--text-dim);line-height:1.5;margin-bottom:16px}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end}
+.modal-actions button{
+  padding:9px 16px;border-radius:10px;border:none;font-size:13px;
+  cursor:pointer;font-weight:600;transition:all .2s;
+}
+.btn-cancel{background:var(--bg-elev);color:var(--text)}
+.btn-cancel:hover{background:var(--border)}
+.btn-danger{background:var(--error);color:#fff}
+.btn-danger:hover{opacity:.9}
+
+body{overscroll-behavior:none}
+
+/* ========== LAPTOP ========== */
+@media (min-width:768px){
+  .app{
+    max-width:820px;height:94dvh;margin:3dvh auto;border-radius:22px;
+    overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.6);
+    border:1px solid var(--border);
+  }
+  .logo-text h1{font-size:16px}
+  .logo-text p{font-size:12px}
+  .bubble{max-width:75%;font-size:14.5px}
+  .chat-box{padding:22px;gap:16px}
+  .logo-img{width:46px;height:46px}
+}
+
+@media (max-width:360px){
+  .logo-text p{display:none}
+  .bubble{font-size:13px;max-width:88%;padding:10px 12px}
+  .chip{font-size:11px;padding:6px 10px}
+  .avatar-img{width:32px;height:32px}
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <header class="app-header">
+    <div class="logo">
+      <img class="logo-img" id="logoImg" alt="Appis AI">
+      <div class="logo-text">
+        <h1> AI Appis<span class="badge">Beta</span></h1>
+        <p><span class="status-dot"></span> Online — <span id="totalBelajar">0</span> memori</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="btnInfo" title="Info & Statistik" type="button">ℹ️</button>
+      <button class="btn-icon" id="btnUpload" title="Upload Excel" type="button">📤</button>
+      <button class="btn-icon" id="btnReset" title="Reset Pembelajaran" type="button">🔄</button>
+    </div>
+  </header>
+
+  <!-- PANEL INFO (TERSEMBUNYI) -->
+  <div class="info-panel" id="infoPanel">
+    <h4>📊 Statistik AI Appis</h4>
+    <div class="info-row">
+      <span class="label">Total Data</span>
+      <span class="value" id="statTotal">0</span>
+    </div>
+    <div class="info-row">
+      <span class="label">Kode Unik</span>
+      <span class="value" id="statKode">0</span>
+    </div>
+    <div class="info-row">
+      <span class="label">Dipelajari</span>
+      <span class="value green" id="statBelajar">0</span>
+    </div>
+    <div class="info-row">
+      <span class="label">Akurasi</span>
+      <span class="value green" id="statAkurasi">0%</span>
+    </div>
+    <div class="info-row">
+      <span class="label">Total Query</span>
+      <span class="value" id="statQuery">0</span>
+    </div>
+  </div>
+
+  <main class="chat-box" id="chatBox">
+    <div class="message bot">
+      <img class="avatar-img bot-avatar" alt="Appis AI">
+      <div class="bubble">
+        Halo! 👋 Aku <b> AI Appis</b> — asisten pencari data.<br><br>
+        <b>Cara pakai:</b><br>
+        1️⃣ Tanya dengan bahasa natural<br>
+        2️⃣ Klik kode yang paling tepat<br>
+        3️⃣ Aku akan mengingat & prioritaskan<br><br>
+        Semakin sering dipakai, semakin pintar! 🧠✨
+      </div>
+    </div>
+  </main>
+
+  <div class="chips">
+    <button class="chip" type="button" onclick="kirimCepat('stunting')">🌱 Stunting</button>
+    <button class="chip" type="button" onclick="kirimCepat('rapat koordinasi')">🗣️ Rapat Koordinasi</button>
+    <button class="chip" type="button" onclick="kirimCepat('pengadaan barang')">📦 Pengadaan Barang</button>
+    <button class="chip" type="button" onclick="kirimCepat('kepegawaian')">👥 Kepegawaian</button>
+    <button class="chip" type="button" onclick="kirimCepat('lingkungan hidup')">🌿 Lingkungan Hidup</button>
+    <button class="chip" type="button" onclick="kirimCepat('musrenbang')">🏛️ Musrenbang</button>
+    <button class="chip" type="button" onclick="kirimCepat('reses')">📢 Reses</button>
+    <button class="chip" type="button" onclick="kirimCepat('arsip')">📁 Arsip</button>
+  </div>
+
+  <div class="input-area">
+    <div class="input-wrapper">
+      <input type="text" id="userInput" placeholder="Tanya apa saja..." autocomplete="off" autocorrect="off" spellcheck="false">
+    </div>
+    <button id="btnKirim" type="button" onclick="kirimPesan()" aria-label="Cari">➤</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalReset">
+  <div class="modal">
+    <h3>🔄 Reset Pembelajaran?</h3>
+    <p>Semua yang sudah AI pelajari (pilihan user & feedback) akan dihapus. Database surat tetap aman.</p>
+    <div class="modal-actions">
+      <button class="btn-cancel" type="button" onclick="tutupModal()">Batal</button>
+      <button class="btn-danger" type="button" onclick="konfirmasiReset()">Ya, Reset</button>
+    </div>
+  </div>
+</div>
+
+<input type="file" id="fileInput" accept=".xlsx,.xls,.csv" hidden>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ==========================================================
+   ⚙️ CONFIG — GANTI GAMBAR AVATAR DI SINI
+   ==========================================================
+   Pilihan:
+   1. Link online      → "https://i.imgur.com/abc.png"
+   2. File lokal       → "bot.png" (taruh di folder yang sama)
+   3. Base64           → "data:image/png;base64,..."
+========================================================== */
+const CONFIG = {
+  // Gambar logo & avatar bot
+  botAvatar: "logoAi1.png",
+
+  // Gambar avatar user
+  userAvatar: "logoAi1.png",
+};
+
+/* ==========================================================
+   DATABASE DEFAULT
+========================================================== */
+const DB_DEFAULT = [
+  { kode: "PU.04.00", judul: "Pemerintahan Umum (Stunting)" },
+  { kode: "PU.04.00", judul: "Pelaksanaan Urusan Pemerintah Daerah ( UMUM)" },
+  { kode: "PU.04.00", judul: "Pelaksanaan Urusan Pemerintah Daerah ( Undangan Grebek Jentik )" },
+  { kode: "PU.04.00", judul: "Pelaksanaan Urusan Pemerintah Daerah(Pelaksanaan Dan Laporan PSN )" },
+  { kode: "PU.04.00", judul: "Pelaksanaan Urusan Pemerintahan Daerah (Rapat Bidang  Koordinasi Kesra)" },
+  { kode: "PU.13.02", judul: "Ketahanan Seni, Budaya, Adat, Agama, dan Kemasyarakatan" },
+  { kode: "PU.10.00", judul: "Penataan Ruang Wilayah" },
+  { kode: "PU.10.04", judul: "Pengendalian Lingkungan Hidup" },
+  { kode: "HM.03.03", judul: "Hubungan Dengan Perguruan Tinggi/ Sekolah" },
+  { kode: "HM.01",    judul: "Dokumentasi/Liputan Kegiatan Dinas Pimpinan, Acara Kedinasan, dan Peristiwa-Peristiwa bidang masing-masing, dalam berbagai Media: Lembar/Foto/Video/Rekaman Suara/Multimedia" },
+  { kode: "HM.03.05", judul: "Forum Kehumasan (Musyawarag Masyarakat Desa)" },
+  { kode: "IP/01.02", judul: "Pelaksanaan Penelitian/Pengkajian" },
+  { kode: "BM.01.00", judul: "Lembaga Masyarakat (PKK)" },
+  { kode: "BM.02.03", judul: "Memberdayaan Adat Dan Sosial Budaya Masyarakat" },
+  { kode: "PU.04.00", judul: "Pelaksanaan Urusan Pemerintahan Daerah (AKMP)" },
+  { kode: "PU.04.00", judul: "Pelaksanaan Urusan Pemerintahan Daerah (Mohon Bantuan Kendaraan Kerja Bakti)" },
+  { kode: "PU.04.00", judul: "Pelaksanaan Urusan Pemerintahan Daerah( Laporan PPSU)" },
+  { kode: "PU.04.00", judul: "Pelaksanaan Urusan Pemerintahan Daerah (Rekomendasi )" },
+  { kode: "PU.04.00", judul: "Pelaksanaan Urusan Pemerintahan Daerah (Umum)" },
+  { kode: "PU.04.00", judul: "Pelaksanaan Urusan Pemerintahan Daerah (Laporan Hasil Kegiatan Penanganan dan Antisipasi Genangan Banjir)" },
+  { kode: "PU.10.04", judul: "Pengendalian Lingkungan Hidup" },
+  { kode: "PU.13.02", judul: "Ketahanan Seni, Budaya, Adat, Agama, dan Kemasyarakatan" },
+  { kode: "RB.01.03", judul: "Musrenbang Kecamatan" },
+  { kode: "RB.01.02", judul: "Musrenbang Provinsi" },
+  { kode: "KI.00.01", judul: "Komunikasi Dan Informasi" },
+  { kode: "KA.02.02", judul: "Pengelolaan Arsip Dinas" },
+  { kode: "PA.01.00", judul: "Pelaksanaan Pengawasan" },
+  { kode: "DL.01.02", judul: "Penyelenggaraan Diklat" },
+  { kode: "PU.04.00", judul: "Pemerintah Umum (Keamananan dan Ketertiban Umum)" },
+  { kode: "BM.00.01", judul: "Verponding" },
+  { kode: "PU.04.00", judul: "Pajak" },
+  { kode: "BM.01.00", judul: "Pembinaan Penataan Lembaga Masyarakat di Kelurahan" },
+  { kode: "PU.01.04", judul: "Koordinasi pelayanan administrasi Kecamatan" },
+  { kode: "PU.04.00", judul: "Pelaksanaan Urusan Pemerintahan Daerah (Rapat Koordinasi)" },
+  { kode: "HM.03.00", judul: "Hubungan Antar Badan Pemerintah (Reses)" },
+  { kode: "KG.02.01", judul: "Pengadaan Aparatur Sipil Negara (ASN)" },
+  { kode: "KG.03.00", judul: "Alih Tugas Aparatur Sipil Negara (ASN)" },
+  { kode: "KG.03.01", judul: "Sistim Informasi Kepegawaian" },
+  { kode: "KG.11.00", judul: "Surat Perintah Dinas/Surat Tugas" },
+  { kode: "KG.12.01", judul: "Kesejahteraan Pegawai" },
+  { kode: "UD/00.03", judul: "Dokumen. Perubahan Anggaran" },
+  { kode: "UD.02.04", judul: "Dokumen Penatausahaan Keuangan" },
+  { kode: "HM.00.00", judul: "Penyelengaraan Acara Kedinasaan Upacara" },
+  { kode: "PN.04.02", judul: "Dokumen Pengadaan Barang" },
+  { kode: "PN.01.00", judul: "Dokumen Pelaksanaan Pengadaan" }
+];
+
+/* ==========================================================
+   STATE
+========================================================== */
+let database = DB_DEFAULT.map((d,i) => ({...d, id: i}));
+let memory = loadMemory();
+let stats = {
+  totalQueries: 0,
+  learnedCount: 0,
+  correctFeedback: 0,
+  totalFeedback: 0
+};
+loadStats();
+
+const resultStore = new WeakMap();
+
+/* ==========================================================
+   SET AVATAR DARI CONFIG
+========================================================== */
+function applyAvatars(){
+  // Logo
+  const logo = document.getElementById("logoImg");
+  if(logo) logo.src = CONFIG.botAvatar;
+
+  // Semua avatar bot yang ada
+  document.querySelectorAll(".bot-avatar").forEach(img => {
+    img.src = CONFIG.botAvatar;
+  });
+}
+
+/* ========== STORAGE ========== */
+function loadMemory(){
+  try{ return JSON.parse(localStorage.getItem("ai_kode_memory") || "{}") || {}; }
+  catch(e){ return {}; }
+}
+function saveMemory(){
+  try{ localStorage.setItem("ai_kode_memory", JSON.stringify(memory)); }
+  catch(e){ console.warn("Gagal simpan memori", e); }
+}
+function loadStats(){
+  try{
+    const s = JSON.parse(localStorage.getItem("ai_kode_stats") || "null");
+    if(s && typeof s === "object") stats = { ...stats, ...s };
+  }catch(e){}
+  renderStats();
+}
+function saveStats(){
+  try{ localStorage.setItem("ai_kode_stats", JSON.stringify(stats)); }
+  catch(e){}
+  renderStats();
+}
+
+/* ========== STOPWORDS ========== */
+const STOPWORDS = new Set([
+  "yang","untuk","dan","di","ke","dari","pada","dengan","adalah","itu","ini",
+  "atau","juga","akan","ada","cari","carikan","tolong","apa","kode","surat",
+  "nomor","naskah","judul","tentang","mengenai","berkaitan","file","dong",
+  "ya","kah","sih","min","mohon","bisa","mau","saya","aku","yg","dg"
+]);
+
+/* ========== NORMALISASI ========== */
+function normalisasi(teks){
+  return String(teks).toLowerCase()
+    .replace(/[^\w\s]/g," ")
+    .replace(/\s+/g," ")
+    .trim();
+}
+function tokenize(teks){
+  return normalisasi(teks).split(" ")
+    .filter(w => w.length > 1 && !STOPWORDS.has(w));
+}
+
+/* ========== LEVENSHTEIN ========== */
+function kemiripanKarakter(a,b){
+  a = normalisasi(a); b = normalisasi(b);
+  const m = a.length, n = b.length;
+  if(!m || !n) return 0;
+  const dp = Array.from({length:m+1}, () => new Array(n+1).fill(0));
+  for(let i=0;i<=m;i++) dp[i][0] = i;
+  for(let j=0;j<=n;j++) dp[0][j] = j;
+  for(let i=1;i<=m;i++)
+    for(let j=1;j<=n;j++)
+      dp[i][j] = a[i-1] === b[j-1]
+        ? dp[i-1][j-1]
+        : 1 + Math.min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1]);
+  return 1 - dp[m][n] / Math.max(m,n);
+}
+
+/* ========== TOKEN OVERLAP ========== */
+function kemiripanToken(qt, jt){
+  if(!qt.length) return 0;
+  let cocok = 0;
+  const setJ = new Set(jt);
+  for(const q of qt){
+    if(setJ.has(q)){ cocok += 1; continue; }
+    for(const j of jt){
+      if(kemiripanKarakter(q,j) > 0.75){ cocok += 0.8; break; }
+    }
+  }
+  return cocok / qt.length;
+}
+
+/* ========== SKOR ========== */
+function hitungSkor(query, judul, kode){
+  const qt = tokenize(query);
+  const jt = tokenize(judul);
+  const sToken = kemiripanToken(qt, jt);
+  const sChar  = kemiripanKarakter(query, judul);
+  const qNorm  = normalisasi(query);
+  const kNorm  = normalisasi(kode);
+  const sKode  = qNorm.includes(kNorm) && kNorm.length > 2 ? 1 : 0;
+  return Math.min((sToken*0.60) + (sChar*0.25) + (sKode*0.15), 1);
+}
+
+/* ========== CARI MEMORY MIRIP ========== */
+function cariMemoryMirip(queryNorm){
+  if(memory[queryNorm]) return memory[queryNorm];
+
+  let best = null, bestSim = 0;
+  const qt = tokenize(queryNorm);
+
+  for(const [key, val] of Object.entries(memory)){
+    if(!val || !val.kode) continue;
+    const simChar  = kemiripanKarakter(queryNorm, key);
+    const kt = tokenize(key);
+    const simToken = kemiripanToken(qt, kt);
+    const sim = (simToken*0.7) + (simChar*0.3);
+
+    if(sim > bestSim && sim > 0.65){
+      bestSim = sim;
+      best = val;
+    }
+  }
+  return best;
+}
+
+/* ========== CARI KODE ========== */
+function cariKode(query, topN = 5){
+  if(!database.length) return [];
+  const qNorm = normalisasi(query);
+  const memoriCocok = cariMemoryMirip(qNorm);
+
+  const hasil = database.map(item => {
+    const skorDasar = hitungSkor(query, item.judul, item.kode);
+
+    let bonusMemori = 0;
+    let sudahDipelajari = false;
+
+    if(memoriCocok){
+      const sameKode  = memoriCocok.kode === item.kode;
+      const sameJudul = normalisasi(memoriCocok.judul) === normalisasi(item.judul);
+      if(sameKode && sameJudul){
+        bonusMemori = 0.35 + Math.min((memoriCocok.hits || 1) * 0.03, 0.15);
+        sudahDipelajari = true;
+      }
+    }
+
+    return {
+      ...item,
+      skor: Math.min(skorDasar + bonusMemori, 1),
+      sudahDipelajari,
+      bonusMemori
+    };
+  });
+
+  return hasil
+    .filter(h => h.skor > 0.12)
+    .sort((a,b) => b.skor - a.skor)
+    .slice(0, topN);
+}
+
+/* ========== BELAJAR ========== */
+function belajar(query, item){
+  const key = normalisasi(query);
+  if(!key) return;
+
+  if(memory[key]){
+    memory[key].hits = (memory[key].hits || 0) + 1;
+    memory[key].lastUsed = Date.now();
+    if(memory[key].kode !== item.kode || normalisasi(memory[key].judul) !== normalisasi(item.judul)){
+      memory[key] = {
+        kode: item.kode,
+        judul: item.judul,
+        hits: 1,
+        lastUsed: Date.now()
+      };
+    }
+  } else {
+    memory[key] = {
+      kode: item.kode,
+      judul: item.judul,
+      hits: 1,
+      lastUsed: Date.now()
+    };
+    stats.learnedCount = (stats.learnedCount || 0) + 1;
+  }
+
+  const keyJudul = normalisasi(item.judul);
+  if(keyJudul && keyJudul !== key){
+    if(!memory[keyJudul]){
+      memory[keyJudul] = {
+        kode: item.kode,
+        judul: item.judul,
+        hits: 1,
+        lastUsed: Date.now()
+      };
+    } else {
+      memory[keyJudul].hits = (memory[keyJudul].hits || 0) + 1;
+      memory[keyJudul].lastUsed = Date.now();
+    }
+  }
+
+  saveMemory();
+  saveStats();
+}
+
+/* ==========================================================
+   UI FUNCTIONS
+========================================================== */
+function tambahPesan(teks, tipe){
+  const box = document.getElementById("chatBox");
+  const msg = document.createElement("div");
+  msg.className = `message ${tipe}`;
+
+  const avatarSrc = tipe === "bot" ? CONFIG.botAvatar : CONFIG.userAvatar;
+  const avatarClass = tipe === "bot" ? "bot-avatar" : "user-avatar";
+
+  msg.innerHTML = `
+    <img class="avatar-img ${avatarClass}" src="${avatarSrc}" alt="${tipe}">
+    <div class="bubble">${teks}</div>
+  `;
+  box.appendChild(msg);
+  box.scrollTop = box.scrollHeight;
+  return msg;
+}
+
+function typingIndicator(){
+  const box = document.getElementById("chatBox");
+  const msg = document.createElement("div");
+  msg.className = "message bot";
+  msg.innerHTML = `
+    <img class="avatar-img bot-avatar" src="${CONFIG.botAvatar}" alt="bot">
+    <div class="bubble">
+      <div class="typing"><span></span><span></span><span></span></div>
+    </div>`;
+  box.appendChild(msg);
+  box.scrollTop = box.scrollHeight;
+  return msg;
+}
+
+function tampilkanHasil(hasil, query){
+  if(!hasil.length){
+    tambahPesan(
+      `😔 Tidak ada kode yang cocok dengan "<b>${escapeHtml(query)}</b>".<br>Coba kata kunci lain atau lebih singkat.`,
+      "bot"
+    );
+    return;
+  }
+
+  const box = document.getElementById("chatBox");
+  const msg = document.createElement("div");
+  msg.className = "message bot";
+
+  const jumlahBelajar = hasil.filter(h => h.sudahDipelajari).length;
+  const intro = jumlahBelajar > 0
+    ? `🧠 Aku sudah belajar! Berikut <b>${hasil.length}</b> kode:`
+    : `Aku menemukan <b>${hasil.length}</b> kode terdekat:`;
+
+  let html = `
+    <img class="avatar-img bot-avatar" src="${CONFIG.botAvatar}" alt="bot">
+    <div class="bubble">
+      ${intro}
+      <div class="result-list">`;
+
+  hasil.forEach((item, i) => {
+    const persen = Math.round(item.skor * 100);
+    let kelas = "skor-rendah";
+    if(persen >= 60) kelas = "skor-tinggi";
+    else if(persen >= 35) kelas = "skor-sedang";
+
+    const learnedClass = item.sudahDipelajari ? "learned" : "";
+    const learnedTag = item.sudahDipelajari
+      ? `<span class="learned-tag">🧠 DIPELAJARI</span>`
+      : "";
+
+    html += `
+      <div class="result-card ${learnedClass}" data-index="${i}">
+        <div class="result-header">
+          <span class="result-kode">${escapeHtml(item.kode)} ${learnedTag}</span>
+          <span class="result-skor ${kelas}">${persen}%</span>
+        </div>
+        <div class="result-judul">${escapeHtml(item.judul)}</div>
+      </div>`;
+  });
+
+  html += `</div>
+    <div class="feedback">
+      <span class="feedback-label">Hasil akurat?</span>
+      <button class="fb-btn yes" data-fb="yes" type="button">👍 Ya</button>
+      <button class="fb-btn no" type="button" data-fb="no">👎 Tidak</button>
+    </div>
+  </div>`;
+
+  msg.innerHTML = html;
+  resultStore.set(msg, { query, hasil });
+
+  msg.querySelectorAll(".result-card").forEach(card => {
+    card.addEventListener("click", () => {
+      const idx = parseInt(card.dataset.index, 10);
+      pilihHasil(msg, idx);
+    });
+  });
+
+  msg.querySelectorAll(".fb-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      feedback(msg, btn.dataset.fb);
+    });
+  });
+
+  box.appendChild(msg);
+  box.scrollTop = box.scrollHeight;
+}
+
+/* ========== PILIH HASIL ========== */
+function pilihHasil(msgEl, index){
+  const stored = resultStore.get(msgEl);
+  if(!stored){ showToast("⚠️ Data hasil tidak ditemukan", "error"); return; }
+
+  const { query, hasil } = stored;
+  if(!Number.isInteger(index) || index < 0 || index >= hasil.length){
+    showToast("⚠️ Index hasil tidak valid", "error");
+    return;
+  }
+
+  const item = hasil[index];
+  if(!item){ showToast("⚠️ Item tidak ditemukan", "error"); return; }
+
+  belajar(query, item);
+  copyKode(item.kode);
+  showToast(`🧠 Dicatat! Kode "${item.kode}" dicopy & dipelajari.`, "success");
+
+  tambahPesan(
+    `✅ Sip! Aku sudah belajar:<br>
+    "<em>${escapeHtml(query)}</em>" → <b>${escapeHtml(item.kode)}</b><br>
+    <small style="color:#94a3b8">Lain kali kalau ada pertanyaan mirip, aku akan prioritaskan kode ini.</small>`,
+    "bot"
+  );
+}
+
+/* ========== FEEDBACK ========== */
+function feedback(msgEl, tipe){
+  const stored = resultStore.get(msgEl);
+  if(!stored) return;
+
+  stats.totalFeedback = (stats.totalFeedback || 0) + 1;
+  if(tipe === "yes"){
+    stats.correctFeedback = (stats.correctFeedback || 0) + 1;
+    showToast("🎉 Terima kasih! Aku makin pintar.", "success");
+    tambahPesan("Terima kasih feedback-nya! 🙏 Aku akan terus belajar.", "bot");
+  } else {
+    showToast("😅 Maaf ya, aku akan coba lebih baik lain kali.", "info");
+    tambahPesan("Maaf jawabannya kurang tepat. 😅<br>Coba tulis lebih spesifik ya, atau upload database yang lebih lengkap.", "bot");
+  }
+  saveStats();
+}
+
+/* ========== COPY ========== */
+function copyKode(kode){
+  if(navigator.clipboard && window.isSecureContext){
+    navigator.clipboard.writeText(kode).catch(() => fallbackCopy(kode));
+  } else {
+    fallbackCopy(kode);
+  }
+}
+function fallbackCopy(kode){
+  try{
+    const ta = document.createElement("textarea");
+    ta.value = kode;
+    ta.style.position = "fixed";
+    ta.style.opacity = "0";
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand("copy");
+    document.body.removeChild(ta);
+  }catch(e){ console.warn("Copy gagal", e); }
+}
+
+/* ========== KIRIM PESAN ========== */
+let isProcessing = false;
+
+function kirimPesan(){
+  if(isProcessing) return;
+
+  const input = document.getElementById("userInput");
+  const teks = input.value.trim();
+  if(!teks) return;
+  if(!database.length){ showToast("⚠️ Belum ada data", "error"); return; }
+
+  isProcessing = true;
+  document.getElementById("btnKirim").disabled = true;
+
+  tambahPesan(escapeHtml(teks), "user");
+  input.value = "";
+  input.focus();
+
+  stats.totalQueries = (stats.totalQueries || 0) + 1;
+  saveStats();
+
+  const typing = typingIndicator();
+  const delay = 250 + Math.random() * 300;
+
+  setTimeout(() => {
+    try{
+      typing.remove();
+      const hasil = cariKode(teks);
+      tampilkanHasil(hasil, teks);
+    }catch(err){
+      console.error("Error saat mencari:", err);
+      tambahPesan("⚠️ Terjadi kesalahan saat mencari. Coba lagi.", "bot");
+    }finally{
+      isProcessing = false;
+      document.getElementById("btnKirim").disabled = false;
+    }
+  }, delay);
+}
+
+function kirimCepat(teks){
+  if(isProcessing) return;
+  document.getElementById("userInput").value = teks;
+  kirimPesan();
+}
+
+/* ========== STATS RENDER ========== */
+function renderStats(){
+  document.getElementById("statTotal").textContent = database.length;
+  const unik = new Set(database.map(d => d.kode)).size;
+  document.getElementById("statKode").textContent = unik;
+  document.getElementById("statBelajar").textContent = stats.learnedCount || 0;
+  document.getElementById("totalBelajar").textContent = stats.learnedCount || 0;
+  document.getElementById("statQuery").textContent = stats.totalQueries || 0;
+
+  const akurasi = stats.totalFeedback > 0
+    ? Math.round((stats.correctFeedback / stats.totalFeedback) * 100)
+    : 0;
+  document.getElementById("statAkurasi").textContent = akurasi + "%";
+}
+
+/* ========== INFO PANEL TOGGLE ========== */
+const infoPanel = document.getElementById("infoPanel");
+const btnInfo = document.getElementById("btnInfo");
+
+btnInfo.addEventListener("click", (e) => {
+  e.stopPropagation();
+  infoPanel.classList.toggle("show");
+});
+
+// Tutup panel jika klik di luar
+document.addEventListener("click", (e) => {
+  if(!infoPanel.contains(e.target) && e.target !== btnInfo){
+    infoPanel.classList.remove("show");
+  }
+});
+
+/* ========== UPLOAD ========== */
+document.getElementById("btnUpload").addEventListener("click", () => {
+  if(typeof XLSX === "undefined"){
+    showToast("⚠️ Library Excel belum siap. Tunggu sebentar...", "error");
+    return;
+  }
+  document.getElementById("fileInput").click();
+});
+
+document.getElementById("fileInput").addEventListener("change", e => {
+  const file = e.target.files[0];
+  if(file) bacaFile(file);
+  e.target.value = "";
+});
+
+function bacaFile(file){
+  if(typeof XLSX === "undefined"){
+    showToast("⚠️ Library Excel belum dimuat.", "error");
+    return;
+  }
+  showToast("📖 Membaca file...", "info");
+  const reader = new FileReader();
+
+  reader.onload = (ev) => {
+    try{
+      const data = new Uint8Array(ev.target.result);
+      const wb = XLSX.read(data, { type: "array" });
+      const sheet = wb.Sheets[wb.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+      if(rows.length < 2){ showToast("File kosong", "error"); return; }
+
+      const header = rows[0].map(h => String(h || "").toLowerCase().trim());
+      const iKode = header.findIndex(h => h.includes("kode") || h.includes("nomor"));
+      const iJudul = header.findIndex(h => h.includes("judul") || h.includes("naskah") || h.includes("nama"));
+
+      if(iKode === -1 || iJudul === -1){
+        showToast("Format tidak dikenali. Butuh kolom Kode & Judul.", "error");
+        return;
+      }
+
+      const baru = rows.slice(1)
+        .filter(r => r[iKode] && r[iJudul])
+        .map((r,i) => ({
+          id: i,
+          kode: String(r[iKode]).trim(),
+          judul: String(r[iJudul]).trim()
+        }));
+
+      if(!baru.length){ showToast("Tidak ada data valid", "error"); return; }
+
+      database = baru;
+      renderStats();
+      tambahPesan(`✅ Database di-update! <b>${baru.length}</b> data dari <b>${escapeHtml(file.name)}</b>.<br>Memori belajar tetap tersimpan. 🧠`, "bot");
+      showToast(`✅ ${baru.length} data dimuat`, "success");
+    }catch(err){
+      console.error(err);
+      showToast("Gagal baca file: " + err.message, "error");
+    }
+  };
+
+  reader.onerror = () => showToast("Gagal membaca file", "error");
+  reader.readAsArrayBuffer(file);
+}
+
+/* ========== RESET ========== */
+document.getElementById("btnReset").addEventListener("click", (e) => {
+  e.stopPropagation();
+  document.getElementById("modalReset").classList.add("show");
+});
+function tutupModal(){
+  document.getElementById("modalReset").classList.remove("show");
+}
+function konfirmasiReset(){
+  memory = {};
+  stats = { totalQueries: 0, learnedCount: 0, correctFeedback: 0, totalFeedback: 0 };
+  saveMemory();
+  saveStats();
+  tutupModal();
+  tambahPesan("🔄 Memori belajar sudah direset. Ayo mulai dari awal lagi!", "bot");
+  showToast("🧹 Memori direset", "info");
+}
+
+/* ========== ESCAPE ========== */
+function escapeHtml(s){
+  return String(s)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+/* ========== TOAST ========== */
+let toastTimer;
+function showToast(msg, tipe){
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.className = `toast show ${tipe || ""}`;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.className = "toast", 2400);
+}
+
+/* ========== EVENT BINDING ========== */
+document.getElementById("userInput").addEventListener("keypress", e => {
+  if(e.key === "Enter") kirimPesan();
+});
+
+document.getElementById("modalReset").addEventListener("click", e => {
+  if(e.target.id === "modalReset") tutupModal();
+});
+
+/* ========== INIT ========== */
+applyAvatars();
+renderStats();
+
+// Welcome back kalau sudah pernah belajar
+setTimeout(() => {
+  const jumlahBelajar = Object.keys(memory).length;
+  if(jumlahBelajar > 0 && stats.learnedCount > 0){
+    tambahPesan(
+      `👋 Selamat datang kembali! Aku masih ingat <b>${stats.learnedCount}</b> hal yang kamu ajarkan. Teruskan belajarnya ya! 🧠`,
+      "bot"
+    );
+  }
+}, 400);
+
+window.__debugAI = { database, memory, stats, cariKode, belajar };
+</script>
+</body>
+</html>
