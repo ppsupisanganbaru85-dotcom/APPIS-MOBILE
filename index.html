@@ -373,7 +373,6 @@ body {
                     <li><a href="#projects" class="nav-item" onclick="handleNavClick(event, this)">Program</a></li>
                     <li><a href="#crm" class="nav-item" onclick="handleNavClick(event, this)">CRM </a></li>
                     <li><a href="#medsos" class="nav-item" onclick="handleNavClick(event, this)">Medsos</a></li>
-                    <!-- MENU ALAT DIPERBARUI: Sekarang mengarah (scroll) ke ID #tools di bawah -->
                     <li><a href="#tools" class="nav-item" onclick="handleNavClick(event, this)">Alat</a></li>
                 </ul>
             </div>
@@ -548,7 +547,6 @@ body {
                     <button class="btn-see-all" id="btn-see-all" style="background:rgba(16,185,129,0.1); border:none; color:var(--success); padding:8px 16px; border-radius:50px; font-weight:700; cursor:pointer;">Lihat Semua</button>
                 </div>
                 
-                <!-- LINK PADA GRID DIPERBARUI: Menggunakan fungsi onclick="openApp()" -->
                 <div class="apps-grid" id="apps-grid">
                     <a href="#" onclick="openApp(event, 'https://rekapabsenppsu.netlify.app/', 'Alat Rekap')" class="app-item">
                         <div class="icon-box"><img src="rekap.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3209/3209265.png'"></div>
@@ -578,7 +576,6 @@ body {
                         <div class="icon-box"><img src="Ai.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/8649/8649595.png'"></div>
                         <span class="app-label">Assistant AI </span>
                     </a>
-                    <!-- Catatan: Jika YouTube memblokir akses iframe (karena kebijakan keamanan Google), ganti baris bawah ini kembali menjadi target="_blank" -->
                     <a href="#" onclick="openApp(event, 'https://youtube.com/@elfidachannel', 'Dokumentasi YT')" class="app-item">
                         <div class="icon-box"><img src="youtube.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/1384/1384060.png'"></div>
                         <span class="app-label">Dokumentasi YT</span>
@@ -637,13 +634,12 @@ body {
         </div>
     </div>
 
-    <!-- 4. APP VIEWER IFRAME MODAL DIPERBARUI -->
+    <!-- 4. APP VIEWER IFRAME MODAL -->
     <div id="app-viewer">
         <div class="viewer-header">
             <button class="btn-back-home" onclick="closeApp()">
                 <i class="fas fa-arrow-left"></i> Kembali ke Dashboard
             </button>
-            <!-- ID ditambahkan pada title bar iframe untuk manipulasi teks otomatis -->
             <span id="viewer-title" style="font-size:0.85rem; opacity:0.9; font-weight:700; color:var(--title);">APPIS Fitur</span>
         </div>
         <iframe id="app-iframe" title="Frame Aplikasi"></iframe>
@@ -655,7 +651,6 @@ body {
         <a href="#projects" class="bnav-item" onclick="handleBNav(this)"><i class="fas fa-layer-group"></i><span>Program</span></a>
         <a href="#crm" class="bnav-item" onclick="handleBNav(this)"><i class="fas fa-comments"></i><span>CRM</span></a>
         <a href="#medsos" class="bnav-item" onclick="handleBNav(this)"><i class="fas fa-share-nodes"></i><span>Medsos</span></a>
-        <!-- MENU ALAT DIPERBARUI: Sekarang mengarah (scroll) ke ID #tools di bawah -->
         <a href="#tools" class="bnav-item" onclick="handleBNav(this)"><i class="fas fa-border-all"></i><span>Alat</span></a>
     </nav>
 
@@ -665,6 +660,31 @@ body {
         const GAS_API_URL = "https://script.google.com/macros/s/AKfycbxpf_rjCKD1QTmBWe6qKJem3PmczrBMuAWQkoYG38kr8ZNEXJwLjkcgLPeZLUKb2INhrg/exec";
 
         let localComplaints = [];
+
+        // --- HELPER FORMAT WAKTU LOKAL REAL-TIME ---
+        function formatWaktuLokal(inputDateString) {
+            if (!inputDateString) return '-';
+            try {
+                // Jika format berupa ISO string atau ISO datetime-local
+                const date = new Date(inputDateString);
+                if (isNaN(date.getTime())) {
+                    // Jika string mentah dari server sudah berupa teks tanggal, kembalikan langsung atau format ulang
+                    return inputDateString;
+                }
+                // Menggunakan format zona waktu lokal Indonesia (id-ID)
+                return date.toLocaleString('id-ID', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: false
+                }).replace(/\//g, '-');
+            } catch (e) {
+                return inputDateString;
+            }
+        }
 
         // --- 1. LOADING SYSTEM ---
         const progress = document.getElementById('progress');
@@ -969,12 +989,17 @@ body {
                 
                 const fotoUtama = item.fotoLokasi || item.fotoLaporan || "https://via.placeholder.com/300x200?text=Foto+Laporan";
 
+                // Format tanggal entri laporan dan jadwal permintaan menggunakan waktu lokal
+                const formattedTanggalLaporan = formatWaktuLokal(item.tanggal);
+                const rawJadwal = item.jadwalPermintaan || item.jadwal || '';
+                const formattedJadwal = rawJadwal ? formatWaktuLokal(rawJadwal) : '-';
+
                 return `
                     <div class="crm-card">
                         <div>
                             <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                                 <span class="crm-badge ${badgeClass}">${item.status || 'Dalam Antrian'}</span>
-                                <span style="font-size:0.7rem; opacity:0.6;">${item.tanggal || ''}</span>
+                                <span style="font-size:0.7rem; opacity:0.6;">${formattedTanggalLaporan}</span>
                             </div>
                             <h4 style="color:var(--title); font-size:1.05rem; margin-bottom:4px;">${item.kategori || 'Pengaduan Warga'}</h4>
                             <p style="font-size:0.75rem; color:var(--accent); font-weight:700; margin-bottom:8px;">
@@ -982,13 +1007,13 @@ body {
                             </p>
                             <p style="font-size:0.82rem; opacity:0.85; line-height:1.5;">${item.deskripsi}</p>
                             <p style="font-size:0.72rem; opacity:0.6; margin-top:6px;">
-                                <i class="fas fa-clock"></i> Jadwal: ${item.jadwalPermintaan || item.jadwal ? (item.jadwalPermintaan || item.jadwal).replace('T', ' ') : '-'}
+                                <i class="fas fa-clock"></i> Jadwal: ${formattedJadwal}
                             </p>
 
                             <div class="crm-img-box">
                                 <div class="crm-img-item">
                                     <img src="${fotoUtama}" alt="Foto Laporan" onerror="this.src='https://via.placeholder.com/300x200?text=Foto+Laporan'">
-                                    <div class="crm-img-label">Lokasi Kejadian</div>
+                                    <div class="crm-img-label">Lokasi Laporan</div>
                                 </div>
                                 ${item.fotoTindakLanjut ? `
                                 <div class="crm-img-item">
@@ -1050,7 +1075,7 @@ body {
                     status: "Belum Ditanggapi (Dalam Antrian)",
                     tanggapan: "",
                     fotoTindakLanjut: "",
-                    tanggal: new Date().toLocaleDateString('id-ID')
+                    tanggal: new Date().toISOString()
                 };
 
                 localComplaints.unshift(newCard);
@@ -1117,21 +1142,17 @@ body {
 
         // --- 5. FUNGSI MEMBUKA & MENUTUP APP VIEWER (IFRAME MODAL) ---
         function openApp(event, url, appName) {
-            if(event) event.preventDefault(); // Mencegah reload/tab baru
+            if(event) event.preventDefault();
             
             const appViewer = document.getElementById('app-viewer');
             const iframe = document.getElementById('app-iframe');
             const viewerTitle = document.getElementById('viewer-title');
             
-            // Ubah teks judul sesuai aplikasi yang sedang dibuka
             if (viewerTitle) {
                 viewerTitle.innerText = appName || "APPIS Sub-Portal";
             }
             
-            // Masukkan link tujuan ke iframe
             iframe.src = url;
-            
-            // Tampilkan layar overlay
             appViewer.style.display = 'flex';
         }
 
@@ -1139,7 +1160,7 @@ body {
             const appViewer = document.getElementById('app-viewer');
             const iframe = document.getElementById('app-iframe');
             if (appViewer) appViewer.style.display = 'none';
-            if (iframe) iframe.src = ''; // Kosongkan iframe saat ditutup agar memory ringan
+            if (iframe) iframe.src = '';
         }
 
     </script>
